@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import { BrowserTracing } from '@sentry/tracing';
 
 // Sentry 配置
 export const initSentry = () => {
@@ -9,18 +8,7 @@ export const initSentry = () => {
       environment: process.env.NODE_ENV,
       
       // 性能监控
-      integrations: [
-        new BrowserTracing({
-          // 自动追踪页面导航
-          routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-            React.useEffect,
-            useLocation,
-            useNavigationType,
-            createRoutesFromChildren,
-            matchRoutes
-          ),
-        }),
-      ],
+      integrations: [],
       
       // 采样率配置
       tracesSampleRate: 0.1, // 10% 的事务被追踪

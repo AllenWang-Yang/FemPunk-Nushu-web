@@ -18,32 +18,32 @@ interface ArtworkData {
 const FEATURED_ARTWORKS: ArtworkData[] = [
   {
     id: '1',
-    imageUrl: 'https://www.figma.com/api/mcp/asset/a6373279-6d52-4edf-9218-f6d1b72ba886',
+    imageUrl: '/images/homepage/second_bg.png',
     alt: 'Community Artwork 1'
   },
   {
     id: '2', 
-    imageUrl: 'https://www.figma.com/api/mcp/asset/52fff1ab-659b-4c98-aeee-775f3ef30f63',
+    imageUrl: '/images/homepage/kuang.png',
     alt: 'Community Artwork 2'
   },
   {
     id: '3',
-    imageUrl: 'https://www.figma.com/api/mcp/asset/993ef106-aa75-444c-a6ee-b673a15a8b49',
+    imageUrl: '/images/homepage/second_bg.png',
     alt: 'Community Artwork 3'
   },
   {
     id: '4',
-    imageUrl: 'https://www.figma.com/api/mcp/asset/6d329de4-1fa1-4f48-a33b-9342bef9ddc8',
+    imageUrl: '/images/homepage/kuang.png',
     alt: 'Community Artwork 4'
   },
   {
     id: '5',
-    imageUrl: 'https://www.figma.com/api/mcp/asset/ab7991b7-a71a-4415-a109-4cb079f4e25a',
+    imageUrl: '/images/homepage/second_bg.png',
     alt: 'Community Artwork 5'
   },
   {
     id: '6',
-    imageUrl: 'https://www.figma.com/api/mcp/asset/31764469-bdfc-4cd4-93d1-8a64c2d39da9',
+    imageUrl: '/images/homepage/kuang.png',
     alt: 'Community Artwork 6'
   }
 ];
@@ -81,7 +81,7 @@ export function OptimizedHomePage() {
           <div className={styles.gradientOverlay} />
           <div className={styles.bgMainImage}>
             <Image
-              src="https://www.figma.com/api/mcp/asset/a10986f5-0f38-43ac-894d-ab94cc5848a8"
+              src="/images/homepage/top_bg.png"
               alt=""
               fill
               priority
@@ -93,7 +93,7 @@ export function OptimizedHomePage() {
           {/* Simplified decorative elements for better performance */}
           <div className={styles.decorLeft}>
             <Image
-              src="https://www.figma.com/api/mcp/asset/0ca3141b-80cd-4dac-940e-d33ee5617ba9"
+              src="/images/homepage/left_img1.png"
               alt=""
               width={360}
               height={400}
@@ -103,7 +103,7 @@ export function OptimizedHomePage() {
           
           <div className={styles.decorRight}>
             <Image
-              src="https://www.figma.com/api/mcp/asset/1852609e-2922-4678-bd88-ca7c555f4284"
+              src="/images/homepage/right_img1.png"
               alt=""
               width={430}
               height={400}
@@ -116,7 +116,7 @@ export function OptimizedHomePage() {
         <section className={styles.heroSection} aria-labelledby="hero-title">
           <div className={styles.heroTitle} id="hero-title">
             <Image
-              src="https://www.figma.com/api/mcp/asset/37571abf-bfaf-4531-a440-ce475c8d0b25"
+              src="/images/homepage/nvshu.png"
               alt="Nvshu Reborn Art Co-creation"
               width={846}
               height={233}
@@ -133,7 +133,7 @@ export function OptimizedHomePage() {
           {/* Decorative Elements */}
           <div className={styles.polygonLeft} aria-hidden="true">
             <Image
-              src="https://www.figma.com/api/mcp/asset/d3014bc4-3192-4ef9-bc6c-3ea36a795f3b"
+              src="/images/homepage/left_img2.png"
               alt=""
               width={574}
               height={770}
@@ -142,7 +142,7 @@ export function OptimizedHomePage() {
           </div>
           <div className={styles.polygonRight} aria-hidden="true">
             <Image
-              src="https://www.figma.com/api/mcp/asset/fb114c74-9bd7-4376-9696-ed6549442c8b"
+              src="/images/homepage/right_img2.png"
               alt=""
               width={574}
               height={770}
@@ -154,18 +154,7 @@ export function OptimizedHomePage() {
         {/* Nvshu of Today Section */}
         <section className={styles.nvshuTodaySection} aria-labelledby="nvshu-today-title">
           <div className={styles.sectionTitle} id="nvshu-today-title">
-            <Image
-              src="https://www.figma.com/api/mcp/asset/2a859fdb-b9bb-4acc-aeb5-7e613f49abc3"
-              alt="Nvshu"
-              width={185}
-              height={52}
-            />
-            <Image
-              src="https://www.figma.com/api/mcp/asset/c0b33612-8bcb-47e6-a7a2-ef4f5043f1ff"
-              alt="of Today"
-              width={216}
-              height={52}
-            />
+            <h2 style={{ fontSize: '52px', fontWeight: 'bold', margin: 0 }}>Nvshu of Today</h2>
           </div>
 
           <p className={styles.sectionSubtitle}>
@@ -178,7 +167,7 @@ export function OptimizedHomePage() {
             <div className={styles.characterLayers}>
               <div className={styles.characterMask}>
                 <Image
-                  src="https://www.figma.com/api/mcp/asset/c8e3bfbd-e2d6-4ca2-bc3e-16deb571b9cb"
+                  src="/images/homepage/kuang.png"
                   alt=""
                   fill
                   sizes="480px"
@@ -186,7 +175,7 @@ export function OptimizedHomePage() {
               </div>
               <div className={styles.characterOverlay}>
                 <Image
-                  src="https://www.figma.com/api/mcp/asset/3431327d-92b3-4f60-a9c7-500a148fb4e0"
+                  src="/images/homepage/second_bg.png"
                   alt=""
                   width={331}
                   height={331}
@@ -194,7 +183,7 @@ export function OptimizedHomePage() {
               </div>
               <div className={styles.characterBase}>
                 <Image
-                  src="https://www.figma.com/api/mcp/asset/0453d87a-aa8a-4afa-9790-f658a6c7c7dd"
+                  src="/images/homepage/kuang.png"
                   alt=""
                   fill
                   sizes="480px"
@@ -218,13 +207,7 @@ export function OptimizedHomePage() {
               }}
               aria-describedby="paint-description"
             >
-              <Image
-                src="https://www.figma.com/api/mcp/asset/87e53dc9-cb97-48a6-b825-b8ad6f1ab046"
-                alt=""
-                width={28}
-                height={28}
-                aria-hidden="true"
-              />
+              <span style={{ marginRight: '8px', fontSize: '28px' }} aria-hidden="true">🎨</span>
               <span>Start Painting</span>
             </button>
             <p id="paint-description" className={styles.srOnly}>
@@ -236,18 +219,7 @@ export function OptimizedHomePage() {
         {/* Community Artworks Section */}
         <section className={styles.communitySection} aria-labelledby="community-title">
           <div className={styles.sectionTitle} id="community-title">
-            <Image
-              src="https://www.figma.com/api/mcp/asset/1d29ed5a-9430-4cf4-908b-232bd1050941"
-              alt="Community"
-              width={247}
-              height={52}
-            />
-            <Image
-              src="https://www.figma.com/api/mcp/asset/cd4c7ebf-1155-459c-b1ce-298257efb2ec"
-              alt="Artworks"
-              width={244}
-              height={52}
-            />
+            <h2 style={{ fontSize: '52px', fontWeight: 'bold', margin: 0 }}>Community Artworks</h2>
           </div>
 
           <p className={styles.sectionSubtitle}>
@@ -292,13 +264,7 @@ export function OptimizedHomePage() {
           <div className={styles.viewAllLink}>
             <button onClick={handleViewAllArtworks} className={styles.viewAllButton}>
               <span>View all artworks</span>
-              <Image
-                src="https://www.figma.com/api/mcp/asset/f40e1eb7-7621-40cb-a9c4-13b0d6778c74"
-                alt=""
-                width={20}
-                height={20}
-                aria-hidden="true"
-              />
+              <span style={{ marginLeft: '8px', fontSize: '20px' }} aria-hidden="true">→</span>
             </button>
           </div>
         </section>

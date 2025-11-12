@@ -278,7 +278,7 @@ export function RevenueModal({ isOpen, onClose, canvasId, mode }: RevenueModalPr
                     </button>
                   </div>
                 </div>
-      
+              )}
             </>
           )}
         </div>

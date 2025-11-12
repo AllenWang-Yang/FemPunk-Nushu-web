@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+import { API_ENDPOINTS, API_HEADERS, fetchWithTimeout } from '@/lib/config/api';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,12 +13,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${BACKEND_URL}/api/colors/owner/${address}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetchWithTimeout(
+      API_ENDPOINTS.colors.owner(address),
+      {
+        method: 'GET',
+        headers: API_HEADERS,
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.text();
