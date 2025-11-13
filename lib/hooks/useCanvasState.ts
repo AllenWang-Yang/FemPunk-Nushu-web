@@ -10,7 +10,13 @@ export function useCanvasState() {
   const [localCanvasObjects, setLocalCanvasObjects] = useState<any[]>([]);
   const [localCanvasVersion, setLocalCanvasVersion] = useState(0);
   const [localContributors, setLocalContributors] = useState<Record<string, ContributorData>>({});
-  const [localPresence, setLocalPresence] = useState<any>({
+  const [localPresence, setLocalPresence] = useState<{
+    cursor: { x: number; y: number } | null;
+    selectedColor: string | null;
+    isDrawing: boolean;
+    userAddress: string | null;
+    userName: string | null;
+  }>({
     cursor: null,
     selectedColor: null,
     isDrawing: false,
