@@ -44,8 +44,8 @@ export function useCollaborativeCanvas({
   const {
     broadcastCanvasOperation,
     broadcastStrokeAdded,
-    onCanvasUpdated,
-    onStrokeAdded: onRemoteStrokeAdded,
+    registerCanvasUpdatedCallback,
+    registerStrokeAddedCallback,
   } = useCanvasEvents();
 
   const { activeUsers } = useActiveUsers();
@@ -160,24 +160,23 @@ export function useCollaborativeCanvas({
   useEffect(() => {
     if (!fabricCanvas) return;
 
-    const unsubscribe = onCanvasUpdated((operation) => {
+    registerCanvasUpdatedCallback((operation) => {
       if (operation.userId === userAddress) return; // Ignore own operations
 
       switch (operation.type) {
-        case 'ADD_OBJECT':
-          if (operation.objectData) {
-            fabricCanvas.syncObjectFromRemote(operation.objectData);
+        case 'draw':
+          if (operation.data.path) {
+            // Handle draw operation
+            fabricCanvas.syncObjectFromRemote(operation.data);
           }
           break;
-        case 'CLEAR_CANVAS':
+        case 'clear':
           fabricCanvas.clearCanvas();
           break;
         // Add more operation types as needed
       }
     });
-
-    return unsubscribe;
-  }, [fabricCanvas, userAddress, onCanvasUpdated]);
+  }, [fabricCanvas, userAddress, registerCanvasUpdatedCallback]);
 
   // Handle mouse events for cursor tracking
   useEffect(() => {
