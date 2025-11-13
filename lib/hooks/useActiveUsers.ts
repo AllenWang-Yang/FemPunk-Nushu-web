@@ -30,7 +30,7 @@ export function useActiveUsers() {
     });
 
     // Add current user if they have an address
-    if (myPresence.userAddress) {
+    if (myPresence && myPresence.userAddress) {
       users.push({
         address: myPresence.userAddress,
         cursor: myPresence.cursor,
@@ -58,7 +58,7 @@ export function useActiveUsers() {
 
   // Get current user info
   const currentUser = useMemo(() => {
-    if (!myPresence.userAddress) return null;
+    if (!myPresence || !myPresence.userAddress) return null;
     
     return {
       address: myPresence.userAddress,
