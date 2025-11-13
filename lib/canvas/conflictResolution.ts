@@ -8,8 +8,8 @@ interface ConflictResolutionStrategy {
 export class LastWriterWinsStrategy implements ConflictResolutionStrategy {
   resolveConflict(localOp: CanvasOperation, remoteOp: CanvasOperation): CanvasOperation[] {
     // Compare timestamps
-    const localTime = new Date(localOp.timestamp).getTime();
-    const remoteTime = new Date(remoteOp.timestamp).getTime();
+    const localTime = localOp.timestamp instanceof Date ? localOp.timestamp.getTime() : new Date(localOp.timestamp).getTime();
+    const remoteTime = remoteOp.timestamp instanceof Date ? remoteOp.timestamp.getTime() : new Date(remoteOp.timestamp).getTime();
     
     if (remoteTime > localTime) {
       return [remoteOp]; // Remote operation wins
@@ -26,35 +26,35 @@ export class LastWriterWinsStrategy implements ConflictResolutionStrategy {
 export class OperationalTransformStrategy implements ConflictResolutionStrategy {
   resolveConflict(localOp: CanvasOperation, remoteOp: CanvasOperation): CanvasOperation[] {
     // If operations are on different objects, both can be applied
-    if (localOp.objectId !== remoteOp.objectId) {
+    if (localOp.data.objectId !== remoteOp.data.objectId) {
       return [localOp, remoteOp];
     }
 
     // If operations are on the same object, apply transformation
     switch (localOp.type) {
-      case 'ADD_OBJECT':
-        if (remoteOp.type === 'ADD_OBJECT') {
-          // Both trying to add the same object, use timestamp
+      case 'draw':
+        if (remoteOp.type === 'draw') {
+          // Both drawing, use timestamp
           return new LastWriterWinsStrategy().resolveConflict(localOp, remoteOp);
         }
         break;
         
-      case 'MODIFY_OBJECT':
-        if (remoteOp.type === 'MODIFY_OBJECT') {
-          // Merge modifications if possible
+      case 'erase':
+        if (remoteOp.type === 'erase') {
+          // Both erasing, merge if possible
           return this.mergeModifications(localOp, remoteOp);
-        } else if (remoteOp.type === 'DELETE_OBJECT') {
-          // Remote delete wins over local modify
+        } else if (remoteOp.type === 'clear') {
+          // Remote clear wins over local erase
           return [remoteOp];
         }
         break;
         
-      case 'DELETE_OBJECT':
-        if (remoteOp.type === 'DELETE_OBJECT') {
-          // Both deleting same object, either one is fine
+      case 'clear':
+        if (remoteOp.type === 'clear') {
+          // Both clearing, either one is fine
           return [localOp];
         } else {
-          // Local delete wins over remote modify
+          // Local clear wins over remote operations
           return [localOp];
         }
         break;
@@ -66,25 +66,20 @@ export class OperationalTransformStrategy implements ConflictResolutionStrategy 
 
   private mergeModifications(localOp: CanvasOperation, remoteOp: CanvasOperation): CanvasOperation[] {
     // Simple merge strategy - combine properties from both operations
-    if (!localOp.objectData || !remoteOp.objectData) {
+    if (!localOp.data || !remoteOp.data) {
       return new LastWriterWinsStrategy().resolveConflict(localOp, remoteOp);
     }
 
     try {
       const mergedData = {
-        ...remoteOp.objectData,
-        ...localOp.objectData,
-        // Use latest timestamp
-        timestamp: Math.max(
-          new Date(localOp.timestamp).getTime(),
-          new Date(remoteOp.timestamp).getTime()
-        ),
+        ...remoteOp.data,
+        ...localOp.data,
       };
 
       const mergedOperation: CanvasOperation = {
         ...localOp,
-        objectData: mergedData,
-        timestamp: new Date().toISOString(),
+        data: mergedData,
+        timestamp: new Date(),
       };
 
       return [mergedOperation];
@@ -121,7 +116,7 @@ export class ConflictResolver {
     const operationGroups = new Map<string, CanvasOperation[]>();
     
     operations.forEach(op => {
-      const key = op.objectId || 'global';
+      const key = op.data.objectId || 'global';
       if (!operationGroups.has(key)) {
         operationGroups.set(key, []);
       }
@@ -136,7 +131,11 @@ export class ConflictResolver {
         resolvedOperations.push(group[0]);
       } else {
         // Sort by timestamp
-        group.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+        group.sort((a, b) => {
+          const aTime = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
+          const bTime = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
+          return aTime - bTime;
+        });
         
         // Resolve conflicts pairwise
         let current = group[0];
