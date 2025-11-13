@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useReadContract } from 'wagmi';
-import { useAccount } from 'wagmi';
+import { useReadContract, useAccount, useChainId } from 'wagmi';
 import { getArtworkNFTContract } from '../contracts/config';
 import type { Artwork, Contributor } from '../../types';
 
 // Hook to get artwork details by token ID
 export function useArtworkDetails(tokenId: number) {
-  const { chainId } = useAccount();
+  const chainId = useChainId();
   
   const contract = chainId ? getArtworkNFTContract(chainId) : null;
   
@@ -58,7 +57,8 @@ export function useArtworkDetails(tokenId: number) {
 
 // Hook to get artworks that a user contributed to
 export function useContributorArtworks(contributorAddress?: string) {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
+  const chainId = useChainId();
   const targetAddress = contributorAddress || address;
   
   const contract = chainId ? getArtworkNFTContract(chainId) : null;
@@ -83,7 +83,8 @@ export function useContributorArtworks(contributorAddress?: string) {
 
 // Hook to get user's artwork balance
 export function useArtworkBalance() {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
+  const chainId = useChainId();
   
   const contract = chainId ? getArtworkNFTContract(chainId) : null;
   
@@ -105,7 +106,7 @@ export function useArtworkBalance() {
 
 // Hook to check artwork ownership
 export function useArtworkOwner(tokenId: number) {
-  const { chainId } = useAccount();
+  const chainId = useChainId();
   
   const contract = chainId ? getArtworkNFTContract(chainId) : null;
   
@@ -127,7 +128,7 @@ export function useArtworkOwner(tokenId: number) {
 
 // Hook to get multiple artwork details efficiently
 export function useMultipleArtworks(tokenIds: number[]) {
-  const { chainId } = useAccount();
+  const chainId = useChainId();
   
   // For now, return mock data to avoid the hooks rule violation
   // This should be replaced with proper batch contract reading
