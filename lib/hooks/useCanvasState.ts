@@ -31,7 +31,16 @@ export function useCanvasState() {
   const contributors = client ? useStorage((root) => root.contributors) : localContributors;
 
   // Get current user presence
-  const [myPresence, updateMyPresence] = client ? useMyPresence() : [localPresence, setLocalPresence];
+  const [myPresence, updateMyPresenceRaw] = client ? useMyPresence() : [localPresence, setLocalPresence];
+  
+  // Wrapper to handle both Liveblocks and local state updates
+  const updateMyPresence = useCallback((update: Partial<typeof localPresence>) => {
+    if (client) {
+      updateMyPresenceRaw(update as any);
+    } else {
+      setLocalPresence(prev => ({ ...prev, ...update }));
+    }
+  }, [client, updateMyPresenceRaw]);
 
   // Mutation to update canvas objects
   const updateCanvasObjects = client ? useMutation(({ storage }, objects: any[]) => {
@@ -110,42 +119,25 @@ export function useCanvasState() {
 
   // Update drawing state
   const setIsDrawing = useCallback((isDrawing: boolean) => {
-    if (client) {
-      updateMyPresence({ isDrawing });
-    } else {
-      setLocalPresence(prev => ({ ...prev, isDrawing }));
-    }
+    updateMyPresence({ isDrawing });
   }, [updateMyPresence]);
 
   // Update selected color
   const setSelectedColor = useCallback((color: string | null) => {
-    if (client) {
-      updateMyPresence({ selectedColor: color });
-    } else {
-      setLocalPresence(prev => ({ ...prev, selectedColor: color }));
-    }
+    updateMyPresence({ selectedColor: color });
   }, [updateMyPresence]);
 
   // Update cursor position
   const updateCursor = useCallback((cursor: { x: number; y: number } | null) => {
-    if (client) {
-      updateMyPresence({ cursor });
-    } else {
-      setLocalPresence(prev => ({ ...prev, cursor }));
-    }
+    updateMyPresence({ cursor });
   }, [updateMyPresence]);
 
   // Set user info
   const setUserInfo = useCallback((userAddress: string, userName?: string) => {
-    const info = { 
+    updateMyPresence({ 
       userAddress,
       userName: userName || `User ${userAddress.slice(0, 6)}...`,
-    };
-    if (client) {
-      updateMyPresence(info);
-    } else {
-      setLocalPresence(prev => ({ ...prev, ...info }));
-    }
+    });
   }, [updateMyPresence]);
 
   // Record stroke for contribution tracking
