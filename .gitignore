@@ -63,5 +63,9 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
 # Old Figma exports
 UI tsx files/
+
+# Docs with sensitive information
+docs/figma-integration.md

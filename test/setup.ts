@@ -100,21 +100,23 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock localStorage with BigInt support
-const localStorageMock = {
-  getItem: vi.fn((key: string) => {
-    const item = localStorageMock._storage[key];
+const localStorageMock: Storage & { _storage: Record<string, string> } = {
+  _storage: {} as Record<string, string>,
+  length: 0,
+  key: vi.fn((index: number) => null),
+  getItem: vi.fn(function(this: typeof localStorageMock, key: string) {
+    const item = this._storage[key];
     return item || null;
   }),
-  setItem: vi.fn((key: string, value: string) => {
-    localStorageMock._storage[key] = value;
+  setItem: vi.fn(function(this: typeof localStorageMock, key: string, value: string) {
+    this._storage[key] = value;
   }),
-  removeItem: vi.fn((key: string) => {
-    delete localStorageMock._storage[key];
+  removeItem: vi.fn(function(this: typeof localStorageMock, key: string) {
+    delete this._storage[key];
   }),
-  clear: vi.fn(() => {
-    localStorageMock._storage = {};
+  clear: vi.fn(function(this: typeof localStorageMock) {
+    this._storage = {};
   }),
-  _storage: {} as Record<string, string>,
 };
 
 Object.defineProperty(window, 'localStorage', {

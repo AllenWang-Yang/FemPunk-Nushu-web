@@ -1,4 +1,4 @@
-import { onCLS, onFID, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
+import { onCLS, onINP, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 import { trackPerformanceMetric } from './sentry';
 
 // Web Vitals 指标追踪
@@ -9,8 +9,8 @@ export const initWebVitals = () => {
       reportWebVital(metric);
     });
     
-    // 首次输入延迟
-    onFID((metric: Metric) => {
+    // 交互到下一次绘制 (替代 FID)
+    onINP((metric: Metric) => {
       reportWebVital(metric);
     });
     
@@ -37,8 +37,9 @@ const reportWebVital = (metric: Metric) => {
   trackPerformanceMetric(metric.name, metric.value);
   
   // 发送到 Vercel Analytics
-  if (process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ID) {
-    window.va?.track('Web Vital', {
+  if (process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ID && typeof window !== 'undefined') {
+    const va = (window as any).va;
+    va?.track('Web Vital', {
       name: metric.name,
       value: metric.value,
       rating: metric.rating,
@@ -47,8 +48,8 @@ const reportWebVital = (metric: Metric) => {
   }
   
   // 发送到 Google Analytics
-  if (typeof window.gtag !== 'undefined') {
-    window.gtag('event', metric.name, {
+  if (typeof window !== 'undefined' && typeof (window as any).gtag !== 'undefined') {
+    (window as any).gtag('event', metric.name, {
       event_category: 'Web Vitals',
       value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
       event_label: metric.id,
