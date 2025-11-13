@@ -13,7 +13,7 @@ import { createThemeQueryPrefetch } from '../queries/themeQueries';
 // Data synchronization service
 export function useDataSync() {
   const queryClient = useQueryClient();
-  const { address, isConnected, chainId: wagmiChainId } = useAccount();
+  const { address, isConnected } = useAccount();
   const chainId = useChainId();
   
   const { 

@@ -50,7 +50,7 @@ export function usePurchaseFlow(): PurchaseFlowHooks {
   
   // Get user's ETH balance
   const { data: balance } = useBalance({
-    address,
+    address: address as `0x${string}`,
   });
 
   const [state, setState] = useState<PurchaseState>({

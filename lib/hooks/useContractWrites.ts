@@ -1,12 +1,11 @@
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { useAccount } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount, useChainId } from 'wagmi';
 import { parseEther } from 'viem';
 import { getColorNFTContract, getArtworkNFTContract, GAS_LIMITS } from '../contracts/config';
 import { useState } from 'react';
 
 // Hook for purchasing color NFTs
 export function usePurchaseColor() {
-  const { chainId } = useAccount();
+  const chainId = useChainId();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const [isConfirming, setIsConfirming] = useState(false);
   
@@ -47,7 +46,7 @@ export function usePurchaseColor() {
 
 // Hook for redeeming color with code
 export function useRedeemColor() {
-  const { chainId } = useAccount();
+  const chainId = useChainId();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   
   const contract = chainId ? getColorNFTContract(chainId) : null;
@@ -79,7 +78,7 @@ export function useRedeemColor() {
 
 // Hook for minting artwork NFTs
 export function useMintArtwork() {
-  const { chainId } = useAccount();
+  const chainId = useChainId();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   
   const contract = chainId ? getArtworkNFTContract(chainId) : null;
@@ -120,7 +119,8 @@ export function useMintArtwork() {
 
 // Hook for transferring NFTs
 export function useTransferNFT() {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
+  const chainId = useChainId();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({

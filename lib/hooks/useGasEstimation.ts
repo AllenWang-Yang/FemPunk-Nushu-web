@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { usePublicClient, useAccount } from 'wagmi';
-import { formatEther, parseEther } from 'viem';
+import { usePublicClient, useAccount, useChainId } from 'wagmi';
+import { formatEther, parseEther, type Address } from 'viem';
 import { getColorNFTContract, getArtworkNFTContract, GAS_LIMITS } from '../contracts/config';
 
 export interface GasEstimate {
@@ -16,7 +16,8 @@ export interface GasEstimate {
 
 // Hook for estimating gas costs
 export function useGasEstimation() {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
+  const chainId = useChainId();
   const publicClient = usePublicClient();
   
   const [gasPrice, setGasPrice] = useState<bigint>(0n);
@@ -67,7 +68,7 @@ export function useGasEstimation() {
         functionName: 'purchaseColor',
         args: [colorHex],
         value: parseEther(priceInEth),
-        account: address,
+        account: address as Address,
       });
 
       const totalCost = gasLimit * gasPrice;
@@ -115,7 +116,7 @@ export function useGasEstimation() {
         ...contract,
         functionName: 'mintArtwork',
         args: [canvasData, contributors as `0x${string}`[], contributionsInWei, dailyThemeId],
-        account: address,
+        account: address as Address,
       });
 
       const totalCost = gasLimit * gasPrice;
@@ -159,7 +160,7 @@ export function useGasEstimation() {
         ...contract,
         functionName: 'redeemColor',
         args: [redemptionCode],
-        account: address,
+        account: address as Address,
       });
 
       const totalCost = gasLimit * gasPrice;

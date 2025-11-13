@@ -1,31 +1,31 @@
-import { getCLS, getFID, getFCP, getLCP, getTTFB, Metric } from 'web-vitals';
+import { onCLS, onFID, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 import { trackPerformanceMetric } from './sentry';
 
 // Web Vitals 指标追踪
 export const initWebVitals = () => {
   if (typeof window !== 'undefined') {
     // 累积布局偏移
-    getCLS((metric) => {
+    onCLS((metric: Metric) => {
       reportWebVital(metric);
     });
     
     // 首次输入延迟
-    getFID((metric) => {
+    onFID((metric: Metric) => {
       reportWebVital(metric);
     });
     
     // 首次内容绘制
-    getFCP((metric) => {
+    onFCP((metric: Metric) => {
       reportWebVital(metric);
     });
     
     // 最大内容绘制
-    getLCP((metric) => {
+    onLCP((metric: Metric) => {
       reportWebVital(metric);
     });
     
     // 首字节时间
-    getTTFB((metric) => {
+    onTTFB((metric: Metric) => {
       reportWebVital(metric);
     });
   }
