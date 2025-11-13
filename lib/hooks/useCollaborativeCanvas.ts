@@ -56,8 +56,8 @@ export function useCollaborativeCanvas({
       operationQueueRef.current = new OperationQueue(async (operations) => {
         // Batch process operations
         const objects = operations
-          .filter(op => op.type === 'ADD_OBJECT' && op.objectData)
-          .map(op => op.objectData);
+          .filter(op => op.type === 'draw' && op.data.path)
+          .map(op => op.data);
         
         if (objects.length > 0) {
           updateCanvasObjects(objects);
@@ -87,8 +87,8 @@ export function useCollaborativeCanvas({
       }
     }, 1000);
 
-    // Throttled cursor update
-    const throttledCursorUpdate = throttle((cursor: { x: number; y: number }) => {
+    // Throttled cursor update - defined but will be used in mouse event handler
+    const throttledCursorUpdateFn = throttle((cursor: { x: number; y: number }) => {
       updateCursor(cursor);
     }, 50);
 
@@ -96,13 +96,18 @@ export function useCollaborativeCanvas({
     canvas.onObjectAdded((object) => {
       if (!userAddress) return;
 
-      const objectData = object.toJSON();
+      const objectData = object.toJSON() as any;
       const operation: CanvasOperation = {
-        type: 'ADD_OBJECT',
-        objectId: (object as any).id || `obj_${Date.now()}`,
-        objectData,
+        id: `op_${Date.now()}`,
+        type: 'draw',
         userId: userAddress,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
+        data: {
+          path: objectData.path || [],
+          color: objectData.stroke || '#000000',
+          brushSize: objectData.strokeWidth || 1,
+          objectId: (object as any).id || `obj_${Date.now()}`,
+        },
       };
 
       // Use operation queue for batching
@@ -187,7 +192,7 @@ export function useCollaborativeCanvas({
     const handleMouseMove = (e: fabric.IEvent) => {
       if (e.e instanceof MouseEvent) {
         const pointer = canvas.getPointer(e.e);
-        throttledCursorUpdate({ x: pointer.x, y: pointer.y });
+        updateCursor({ x: pointer.x, y: pointer.y });
       }
     };
 
@@ -242,9 +247,11 @@ export function useCollaborativeCanvas({
     fabricCanvas.clearCanvas();
     
     const operation: CanvasOperation = {
-      type: 'CLEAR_CANVAS',
+      id: `op_${Date.now()}`,
+      type: 'clear',
       userId: userAddress,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
+      data: {},
     };
 
     broadcastCanvasOperation(operation);
