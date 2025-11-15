@@ -6,7 +6,7 @@
 .pageLayout {
     position: relative;
     width: 100%;
-    background: #161616;
+    background: transparent;
     color: #ffffff;
     overflow-x: hidden;
 }

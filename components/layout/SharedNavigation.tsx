@@ -56,17 +56,10 @@ export function SharedNavigation({ className, variant = 'default' }: SharedNavig
               aria-label="Go to homepage"
             >
               <Image
-                src="https://www.figma.com/api/mcp/asset/622cce7a-4e71-4086-8741-d8b730ba1fc5"
+                src="/images/homepage/fempunk_logo.png"
                 alt="FemPunk Logo"
-                width={18}
-                height={41}
-                priority
-              />
-              <Image
-                src="https://www.figma.com/api/mcp/asset/749ee3d3-6def-4d3e-819a-a97f6a89ad0f"
-                alt="FemPunk Text"
-                width={140}
-                height={45}
+                width={182}
+                height={56}
                 priority
               />
             </button>
@@ -92,10 +85,10 @@ export function SharedNavigation({ className, variant = 'default' }: SharedNavig
               aria-label={isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Connect wallet'}
             >
               <Image
-                src="https://www.figma.com/api/mcp/asset/b4771eab-5ce8-4d52-bfd5-aa543a398bc4"
+                src="/images/homepage/wallet.png"
                 alt=""
-                width={20}
-                height={20}
+                width={19}
+                height={18}
                 aria-hidden="true"
               />
               <span>

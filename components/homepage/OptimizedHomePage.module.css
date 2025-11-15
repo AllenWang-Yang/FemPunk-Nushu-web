@@ -6,6 +6,7 @@
 .homePage {
     position: relative;
     overflow-x: hidden;
+    background: #161616;
 }
 
 .container {
@@ -14,15 +15,17 @@
     max-width: 1440px;
     min-height: 2700px;
     margin: 0 auto;
-    background: #161616;
 }
 
 /* ============================================
    BACKGROUND LAYERS - OPTIMIZED
    ============================================ */
 .backgroundLayers {
-    position: absolute;
-    inset: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
     pointer-events: none;
     z-index: 1;
 }
@@ -32,9 +35,9 @@
     inset: 0;
     background: linear-gradient(
         to bottom, 
-        #161616 0%, 
-        #161616 91.658%, 
-        rgba(22, 22, 22, 0) 100%
+        rgba(22, 22, 22, 0) 0%, 
+        rgba(22, 22, 22, 0.3) 50%, 
+        rgba(22, 22, 22, 0.8) 100%
     );
     z-index: 2;
 }
@@ -42,21 +45,104 @@
 .bgMainImage {
     position: absolute;
     inset: 0;
-    mix-blend-mode: multiply;
     z-index: 1;
 }
 
 .decorLeft {
     position: absolute;
-    left: -97px;
-    top: 135px;
+    left: -96.43px;
+    top: 134.56px;
     z-index: 3;
 }
 
 .decorRight {
     position: absolute;
-    right: -129px;
-    top: 227px;
+    left: 1154.72px;
+    top: 285.92px;
+    z-index: 3;
+}
+
+.decorRight3 {
+    position: absolute;
+    left: 1079.85px;
+    top: 251.99px;
+    z-index: 2;
+}
+
+.line1 {
+    position: absolute;
+    left: -1px;
+    top: 553px;
+    z-index: 3;
+}
+
+.line2 {
+    position: absolute;
+    left: -6px;
+    top: 1259.05px;
+    z-index: 3;
+}
+
+.words1 {
+    position: absolute;
+    left: 538px;
+    top: 401px;
+    z-index: 10;
+}
+
+.words2 {
+    position: absolute;
+    left: 459px;
+    top: 449px;
+    z-index: 10;
+}
+
+.thorn1 {
+    position: absolute;
+    left: -1.23px;
+    top: 654.93px;
+    z-index: 3;
+}
+
+.thorn2 {
+    position: absolute;
+    left: 810.22px;
+    top: 613.4px;
+    z-index: 3;
+}
+
+.words3 {
+    position: absolute;
+    left: 392px;
+    top: 816px;
+    z-index: 10;
+}
+
+.nvshu1 {
+    position: absolute;
+    left: 513px;
+    top: 747.2px;
+    z-index: 10;
+}
+
+.today {
+    position: absolute;
+    left: 710.59px;
+    top: 752.7px;
+    z-index: 10;
+}
+
+.leftDecor {
+    position: absolute;
+    left: -27px;
+    top: 1043px;
+    z-index: 3;
+}
+
+.rightDecor {
+    position: absolute;
+    left: 881px;
+    top: 993px;
     z-index: 3;
 }
 
@@ -67,21 +153,16 @@
     position: relative;
     width: 100%;
     height: 750px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 141px 20px 0;
     z-index: 15;
 }
 
 .heroTitle {
-    position: relative;
-    width: min(846px, 90vw);
-    height: auto;
-    aspect-ratio: 846 / 233;
+    position: absolute;
+    left: 297px;
+    top: 141px;
+    width: 846px;
+    height: 233px;
     z-index: 20;
-    margin-bottom: 2rem;
 }
 
 .heroSubtitles {
@@ -103,6 +184,20 @@
     margin: 0.5rem auto;
     display: inline-block;
     white-space: nowrap;
+}
+
+.decorLeft2 {
+    position: absolute;
+    left: 206.86px;
+    top: 446.28px;
+    z-index: 10;
+}
+
+.decorRight2 {
+    position: absolute;
+    left: 952.22px;
+    top: 445.18px;
+    z-index: 10;
 }
 
 .polygonLeft,
@@ -209,6 +304,16 @@
     width: 417.6px;
     height: 403.2px;
     opacity: 0.9;
+}
+
+.nvshuTitle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    max-width: 400px;
+    z-index: 10;
 }
 
 .characterTranslation {
