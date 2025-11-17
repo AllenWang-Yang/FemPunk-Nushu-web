@@ -204,6 +204,25 @@ export function OptimizedHomePage() {
           />
         </div>
 
+        {/* Frame and Nvshu character */}
+        <div className={styles.kuangFrame}>
+          <Image
+            src="/images/homepage/kuang.png"
+            alt=""
+            width={514}
+            height={514}
+          />
+        </div>
+
+        <div className={styles.nvshuChar}>
+          <Image
+            src="/images/homepage/nvshu.png"
+            alt=""
+            width={302}
+            height={302}
+          />
+        </div>
+
         <div className={styles.leftDecor}>
           <Image
             src="/images/homepage/left.png"
@@ -221,6 +240,44 @@ export function OptimizedHomePage() {
             height={486}
           />
         </div>
+
+        {/* Community section decorations */}
+        <div className={styles.communityArt}>
+          <Image
+            src="/images/homepage/communityArt.png"
+            alt=""
+            width={491}
+            height={55}
+          />
+        </div>
+
+        <div className={styles.words4}>
+          <Image
+            src="/images/homepage/words4.png"
+            alt=""
+            width={778}
+            height={40}
+          />
+        </div>
+
+        {/* Artworks Canvas and Buttons */}
+        <div className={styles.artworkCanvas1}></div>
+        <button className={styles.artworkButton1}>Mint</button>
+
+        <div className={styles.artworkCanvas2}></div>
+        <button className={styles.artworkButton2}>Buy</button>
+
+        <div className={styles.artworkCanvas3}></div>
+        <button className={styles.artworkButton3}>Buy</button>
+
+        <div className={styles.artworkCanvas4}></div>
+        <button className={styles.artworkButton4}>Buy</button>
+
+        <div className={styles.artworkCanvas5}></div>
+        <button className={styles.artworkButton5}>Buy</button>
+
+        <div className={styles.artworkCanvas6}></div>
+        <button className={styles.artworkButton6}>Buy</button>
 
         {/* Hero Section */}
         <section className={styles.heroSection} aria-labelledby="hero-title">
@@ -256,52 +313,6 @@ export function OptimizedHomePage() {
 
         {/* Nvshu of Today Section */}
         <section className={styles.nvshuTodaySection} aria-labelledby="nvshu-today-title">
-          {/* Nvshu Character Display */}
-          <div className={styles.nvshuCharacter} role="img" aria-label="Today's Nvshu character meaning Spring">
-            <div className={styles.characterGlow} />
-            <div className={styles.characterLayers}>
-              {/* <div className={styles.characterMask}>
-                <Image
-                  src="/images/homepage/kuang.png"
-                  alt=""
-                  fill
-                  sizes="480px"
-                />
-              </div> */}
-              <div className={styles.characterOverlay}>
-                <Image
-                  src="/images/homepage/second_bg.png"
-                  alt=""
-                  width={331}
-                  height={331}
-                />
-              </div>
-              <div className={styles.characterBase}>
-                <Image
-                  src="/images/homepage/kuang.png"
-                  alt=""
-                  fill
-                  sizes="480px"
-                />
-              </div>
-              {/* Nvshu Title in the center */}
-              <div className={styles.nvshuTitle}>
-                <Image
-                  src="/images/homepage/nvshu.png"
-                  alt="Nvshu Reborn Art Co-creation"
-                  width={846}
-                  height={233}
-                  priority
-                  sizes="(max-width: 768px) 90vw, 846px"
-                  style={{ width: '100%', height: 'auto' }}
-                />
-              </div>
-            </div>
-            <div className={styles.characterTranslation}>
-              <span>&quot;Spring&quot;</span>
-            </div>
-          </div>
-
           {/* Start Painting Button */}
           <div className={styles.ctaButtonWrapper}>
             <button
@@ -325,48 +336,6 @@ export function OptimizedHomePage() {
 
         {/* Community Artworks Section */}
         <section className={styles.communitySection} aria-labelledby="community-title">
-          <div className={styles.sectionTitle} id="community-title">
-            <h2 style={{ fontSize: '52px', fontWeight: 'bold', margin: 0 }}>Community Artworks</h2>
-          </div>
-
-          <p className={styles.sectionSubtitle}>
-            Explore past collaborative artworks and feel the visual power of feminine language.
-          </p>
-
-          {/* Artworks Grid */}
-          <div className={styles.artworksGrid} role="grid" aria-label="Community artworks gallery">
-            {FEATURED_ARTWORKS.map((artwork, index) => (
-              <div key={artwork.id} className={styles.artworkItem} role="gridcell">
-                <div className={styles.artworkImage}>
-                  <Image
-                    src={artwork.imageUrl}
-                    alt={artwork.alt}
-                    width={350}
-                    height={350}
-                    sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 350px"
-                    style={{ objectFit: 'cover' }}
-                  />
-                </div>
-                {index === 0 ? (
-                  <SendRevenueButton 
-                    canvasId={parseInt(artwork.id) || 1}
-                    className={styles.mintButton}
-                  >
-                    Mint
-                  </SendRevenueButton>
-                ) : (
-                  <button
-                    className={styles.buyButton}
-                    onClick={() => handleBuyArtwork(artwork.id)}
-                    aria-label={`Buy ${artwork.alt}`}
-                  >
-                    Buy
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
           {/* View All Link */}
           <div className={styles.viewAllLink}>
             <button onClick={handleViewAllArtworks} className={styles.viewAllButton}>

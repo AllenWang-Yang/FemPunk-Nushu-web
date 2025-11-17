@@ -132,6 +132,20 @@
     z-index: 10;
 }
 
+.kuangFrame {
+    position: absolute;
+    left: 511.2px;
+    top: 850px;
+    z-index: 5;
+}
+
+.nvshuChar {
+    position: absolute;
+    left: 684.9px;
+    top: 986.73px;
+    z-index: 6;
+}
+
 .leftDecor {
     position: absolute;
     left: -27px;
@@ -144,6 +158,148 @@
     left: 881px;
     top: 993px;
     z-index: 3;
+}
+
+.communityArt {
+    position: absolute;
+    left: 475px;
+    top: 1522px;
+    z-index: 10;
+}
+
+.words4 {
+    position: absolute;
+    left: 331px;
+    top: 1589px;
+    z-index: 10;
+}
+
+/* ============================================
+   ARTWORKS POSITIONED LAYOUT
+   ============================================ */
+.artworksContainer {
+    position: relative;
+    width: 100%;
+    height: 1000px;
+    margin-bottom: 100px;
+}
+
+/* Canvas Frames - Empty boxes */
+.artworkCanvas1,
+.artworkCanvas2,
+.artworkCanvas3,
+.artworkCanvas4,
+.artworkCanvas5,
+.artworkCanvas6 {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 15;
+}
+
+/* Row 1 Canvas */
+.artworkCanvas1 {
+    left: 185px;
+    top: 1640px;
+}
+
+.artworkCanvas2 {
+    left: 545px;
+    top: 1640px;
+}
+
+.artworkCanvas3 {
+    left: 905px;
+    top: 1640px;
+}
+
+/* Row 2 Canvas */
+.artworkCanvas4 {
+    left: 185px;
+    top: 2090px;
+}
+
+.artworkCanvas5 {
+    left: 545px;
+    top: 2090px;
+}
+
+.artworkCanvas6 {
+    left: 905px;
+    top: 2090px;
+}
+
+/* Artwork Buttons */
+.artworkButton1,
+.artworkButton2,
+.artworkButton3,
+.artworkButton4,
+.artworkButton5,
+.artworkButton6 {
+    width: 138px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: absolute;
+    z-index: 16;
+}
+
+.artworkButton1 {
+    left: 291px;
+    top: 2014px;
+    background: #1ee11f;
+    color: #161616;
+    font-weight: 600;
+}
+
+.artworkButton2 {
+    left: 651px;
+    top: 2014px;
+}
+
+.artworkButton3 {
+    left: 1011px;
+    top: 2014px;
+}
+
+.artworkButton4 {
+    left: 291px;
+    top: 2464px;
+}
+
+.artworkButton5 {
+    left: 651px;
+    top: 2464px;
+}
+
+.artworkButton6 {
+    left: 1011px;
+    top: 2464px;
+}
+
+.artworkButton1:hover,
+.artworkButton2:hover,
+.artworkButton3:hover,
+.artworkButton4:hover,
+.artworkButton5:hover,
+.artworkButton6:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.05);
+}
+
+.artworkButton1:hover {
+    background: #2fff30;
 }
 
 /* ============================================
@@ -334,7 +490,9 @@
 
 /* Start Painting Button */
 .ctaButtonWrapper {
-    position: relative;
+    position: absolute;
+    left: 565px;
+    top: 1325px;
     z-index: 40;
 }
 
@@ -375,7 +533,7 @@
 .communitySection {
     position: relative;
     width: 100%;
-    padding: 100px 20px;
+    min-height: 1100px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -463,6 +621,9 @@
 /* View All Link */
 .viewAllLink {
     position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
     z-index: 20;
 }
 
