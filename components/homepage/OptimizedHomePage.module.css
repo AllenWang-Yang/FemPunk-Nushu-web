@@ -79,8 +79,8 @@
 .line2 {
     position: absolute;
     left: -6px;
-    top: 1259.05px;
-    z-index: 3;
+    top: 1380px;
+    z-index: 4;
 }
 
 .words1 {
@@ -134,15 +134,15 @@
 
 .kuangFrame {
     position: absolute;
-    left: 511.2px;
+    left: 463px;
     top: 850px;
     z-index: 5;
 }
 
 .nvshuChar {
     position: absolute;
-    left: 684.9px;
-    top: 986.73px;
+    left: 569px;
+    top: 956px;
     z-index: 6;
 }
 
@@ -620,10 +620,10 @@
 
 /* View All Link */
 .viewAllLink {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
+    position: absolute;
+    left: 50%;
+    top: 2564px;
+    transform: translateX(-50%);
     z-index: 20;
 }
 

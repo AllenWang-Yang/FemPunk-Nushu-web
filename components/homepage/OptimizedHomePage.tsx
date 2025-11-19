@@ -223,6 +223,26 @@ export function OptimizedHomePage() {
           />
         </div>
 
+        {/* Start Painting Button */}
+        <div className={styles.ctaButtonWrapper}>
+          <button
+            className={styles.startPaintingButton}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Button clicked!', e);
+              handleStartPainting();
+            }}
+            aria-describedby="paint-description"
+          >
+            <span style={{ marginRight: '8px', fontSize: '28px' }} aria-hidden="true">🎨</span>
+            <span>Start Painting</span>
+          </button>
+          <p id="paint-description" className={styles.srOnly}>
+            Begin collaborative painting on today&apos;s canvas
+          </p>
+        </div>
+
         <div className={styles.leftDecor}>
           <Image
             src="/images/homepage/left.png"
@@ -279,6 +299,14 @@ export function OptimizedHomePage() {
         <div className={styles.artworkCanvas6}></div>
         <button className={styles.artworkButton6}>Buy</button>
 
+        {/* View All Link */}
+        <div className={styles.viewAllLink}>
+          <button onClick={handleViewAllArtworks} className={styles.viewAllButton}>
+            <span>View all artworks</span>
+            <span style={{ marginLeft: '8px', fontSize: '20px' }} aria-hidden="true">→</span>
+          </button>
+        </div>
+
         {/* Hero Section */}
         <section className={styles.heroSection} aria-labelledby="hero-title">
           <div className={styles.heroTitle} id="hero-title">
@@ -311,38 +339,12 @@ export function OptimizedHomePage() {
           </div>
         </section>
 
-        {/* Nvshu of Today Section */}
+        {/* Nvshu of Today Section - Empty placeholder */}
         <section className={styles.nvshuTodaySection} aria-labelledby="nvshu-today-title">
-          {/* Start Painting Button */}
-          <div className={styles.ctaButtonWrapper}>
-            <button
-              className={styles.startPaintingButton}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Button clicked!', e);
-                handleStartPainting();
-              }}
-              aria-describedby="paint-description"
-            >
-              <span style={{ marginRight: '8px', fontSize: '28px' }} aria-hidden="true">🎨</span>
-              <span>Start Painting</span>
-            </button>
-            <p id="paint-description" className={styles.srOnly}>
-              Begin collaborative painting on today&apos;s canvas
-            </p>
-          </div>
         </section>
 
-        {/* Community Artworks Section */}
+        {/* Community Artworks Section - Empty placeholder for structure */}
         <section className={styles.communitySection} aria-labelledby="community-title">
-          {/* View All Link */}
-          <div className={styles.viewAllLink}>
-            <button onClick={handleViewAllArtworks} className={styles.viewAllButton}>
-              <span>View all artworks</span>
-              <span style={{ marginLeft: '8px', fontSize: '20px' }} aria-hidden="true">→</span>
-            </button>
-          </div>
         </section>
       </div>
 
