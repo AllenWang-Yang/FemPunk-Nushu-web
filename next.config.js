@@ -14,6 +14,7 @@ const nextConfig = {
       'cloudflare-ipfs.com',
       'liveblocks.io',
       'www.figma.com',
+      'cdn.builder.io',
     ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 31536000, // 1年缓存
