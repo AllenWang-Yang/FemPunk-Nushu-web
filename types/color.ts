@@ -1,7 +1,6 @@
 /**
  * FemPunk Nvshu - Color Page TypeScript Types
  * Design: Mint颜色页 (Color Mint Page)
- * Node ID: 100:1983
  */
 
 /**

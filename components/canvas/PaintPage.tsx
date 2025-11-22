@@ -84,7 +84,7 @@ export function PaintPage() {
                 PAINT
               </button>
               <button
-                onClick={() => router.push("/buy")}
+                onClick={() => router.push("/color")}
                 className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
               >
                 COLOR
