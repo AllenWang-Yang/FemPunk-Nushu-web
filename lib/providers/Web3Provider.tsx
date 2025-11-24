@@ -13,20 +13,26 @@ import { useGlobalSetup } from '../setup/globalSetup';
 // Import RainbowKit styles
 import '@rainbow-me/rainbowkit/styles.css';
 
-// RainbowKit theme configuration
+// RainbowKit theme configuration - Dark theme with custom colors
 const rainbowKitTheme = {
-  ...lightTheme({
-    accentColor: '#d946ef', // Primary brand color
+  ...darkTheme({
+    accentColor: 'rgba(0, 0, 0, 0.6)', // Black accent color
     accentColorForeground: 'white',
     borderRadius: 'medium',
     fontStack: 'system',
   }),
   colors: {
-    ...lightTheme().colors,
-    modalBackground: 'white',
-    modalBorder: '#e5e7eb',
-    modalText: '#111827',
-    modalTextSecondary: '#6b7280',
+    ...darkTheme().colors,
+    // Connect button colors
+    accentColor: 'rgba(0, 0, 0, 0.6)', // Black background for button
+    accentColorForeground: 'white', // White text
+    connectButtonBackground: 'rgba(0, 0, 0, 0.6)',
+    connectButtonText: 'white',
+    // Modal colors
+    modalBackground: '#1f2937',
+    modalBorder: '#374151',
+    modalText: 'white',
+    modalTextSecondary: '#9ca3af',
   },
 };
 

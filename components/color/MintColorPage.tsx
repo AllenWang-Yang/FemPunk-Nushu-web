@@ -2,18 +2,12 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { WalletModal } from "../wallet/WalletModal";
-import { useWalletModal } from "../../lib/hooks/useWalletModal";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import ColorWheel from "./ColorWheel";
 
 function MintColorPage() {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
-  const {
-    modalState,
-    openModal: openWalletModal,
-    closeModal: closeWalletModal,
-  } = useWalletModal();
+  const { isConnected } = useAccount();
   const [invitationCode, setInvitationCode] = React.useState("");
   const [selectedColor, setSelectedColor] = React.useState("#AD4AFF");
 
@@ -21,15 +15,9 @@ function MintColorPage() {
     router.push(path);
   };
 
-  const handleConnectWallet = () => {
-    if (!isConnected) {
-      openWalletModal();
-    }
-  };
-
   const handleMintColor = () => {
     if (!isConnected) {
-      openWalletModal();
+      alert('Please connect your wallet first');
       return;
     }
     console.log("Minting color:", selectedColor);
@@ -37,7 +25,7 @@ function MintColorPage() {
 
   const handleFreeReceive = () => {
     if (!isConnected) {
-      openWalletModal();
+      alert('Please connect your wallet first');
       return;
     }
     if (invitationCode.trim()) {
@@ -110,21 +98,13 @@ function MintColorPage() {
             </div>
 
             {/* Right side: Connect wallet button */}
-            <button
-              onClick={handleConnectWallet}
-              className="flex items-center justify-center gap-2.5 w-40 h-10 bg-black/60 border border-white/30 rounded-[10px] font-['Montserrat',sans-serif] font-normal text-base text-white cursor-pointer transition-all hover:bg-black/80 hover:border-white/80 hover:-translate-y-px px-3"
-            >
-              <img
-                src="/images/homepage/wallet.png"
-                alt=""
-                className="w-5 h-5 flex-shrink-0"
+            <div className="[&_button]:!bg-black/60 [&_button]:!border-white/30 [&_button]:hover:!bg-black/80">
+              <ConnectButton 
+                chainStatus="icon"
+                accountStatus="address"
+                showBalance={false}
               />
-              <span className="whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
-                {isConnected
-                  ? `${address?.slice(0, 6)}...${address?.slice(-4)}`
-                  : "Connect"}
-              </span>
-            </button>
+            </div>
           </div>
         </nav>
         <div className="relative z-10">
@@ -285,7 +265,6 @@ function MintColorPage() {
         </div>
       </div>
 
-      <WalletModal isOpen={modalState.isOpen} onClose={closeWalletModal} />
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useAccount } from 'wagmi';
-import { WalletStatus } from '../wallet/WalletStatus';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 interface NavigationBarProps {
   currentPage?: 'canvas' | 'buy' | 'collection' | 'community';
@@ -135,7 +135,11 @@ export function NavigationBar({ currentPage }: NavigationBarProps) {
 
           {/* Wallet Status */}
           <div className="flex items-center">
-            <WalletStatus />
+            <ConnectButton 
+              chainStatus="icon"
+              accountStatus="address"
+              showBalance={false}
+            />
           </div>
         </div>
       </div>

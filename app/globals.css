@@ -309,3 +309,36 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* RainbowKit Custom Styles */
+/* Override RainbowKit button styles to use black background and white text */
+[data-rk] button[data-testid="rk-connect-button"],
+[data-rk] button[data-testid="rk-account-button"] {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 0.625rem !important;
+  padding: 0.5rem 1rem !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-rk] button[data-testid="rk-connect-button"]:hover,
+[data-rk] button[data-testid="rk-account-button"]:hover {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Override text colors inside the button */
+[data-rk] button[data-testid="rk-connect-button"] *,
+[data-rk] button[data-testid="rk-account-button"] * {
+  color: white !important;
+}
+
+/* Chain icon styling */
+[data-rk] button[data-testid="rk-account-button"] img {
+  filter: brightness(1.2) !important;
+}

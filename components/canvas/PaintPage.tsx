@@ -1,9 +1,9 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useAccount } from 'wagmi';
 import Image from 'next/image';
-import { useWalletModal } from '../../lib/hooks/useWalletModal';
-import { WalletModal } from '../wallet/WalletModal';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 /**
  * PaintPage Component
@@ -31,7 +31,7 @@ import { WalletModal } from '../wallet/WalletModal';
 
 export function PaintPage() {
   const router = useRouter();
-  const { modalState, openModal, closeModal } = useWalletModal();
+  const { isConnected } = useAccount();
 
   return (
     <div className="relative overflow-hidden bg-[#161616] min-h-screen">
@@ -99,21 +99,13 @@ export function PaintPage() {
           </div>
           
           {/* Right side: Connect wallet button */}
-          <button 
-            onClick={() => openModal()}
-            className="flex items-center justify-center gap-2.5 w-40 h-10 bg-black/60 border border-white/30 rounded-[10px] font-['Montserrat',sans-serif] font-normal text-base text-white cursor-pointer transition-all hover:bg-black/80 hover:border-white/80 hover:-translate-y-px px-3"
-          >
-            <Image
-              src="/images/homepage/wallet.png"
-              alt=""
-              width={20}
-              height={20}
-              className="flex-shrink-0"
+          <div className="[&_button]:!bg-black/60 [&_button]:!border-white/30 [&_button]:hover:!bg-black/80">
+            <ConnectButton 
+              chainStatus="icon"
+              accountStatus="address"
+              showBalance={false}
             />
-            <span className="whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
-              Connect
-            </span>
-          </button>
+          </div>
         </div>
       </nav>
 
@@ -141,35 +133,43 @@ export function PaintPage() {
                   - Features: zoom, pan, brush tools, color selection
                   - Integration with fabric.js or canvas API
                 */}
+                {/* Canvas background image - shown when connected */}
+                {isConnected && (
+                  <Image
+                    src="/images/homepage/spring.png"
+                    alt="Spring canvas background"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                )}
+                
                 <canvas
                   id="paint-canvas"
                   width={910}
                   height={910}
                   className="absolute inset-0 w-full h-full"
                   style={{ 
-                    background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.8) 100%)',
-                    cursor: 'crosshair'
+                    background: isConnected ? 'transparent' : 'linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.8) 100%)',
+                    cursor: isConnected ? 'crosshair' : 'default'
                   }}
                 />
                 
                 {/* Overlay message for non-logged-in users */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                  <div className="text-center px-8">
-                    <div className="text-6xl mb-4">🎨</div>
-                    <h2 className="text-2xl font-bold text-white mb-4">
-                      Connect to Start Painting
-                    </h2>
-                    <p className="text-gray-300 mb-6">
-                      Mint colors and join the collaborative canvas
-                    </p>
-                    <button 
-                      onClick={() => openModal()}
-                      className="px-6 py-3 bg-violet-600 text-white font-semibold rounded-xl hover:bg-violet-700 transition-all transform hover:scale-105"
-                    >
-                      🌈 Connect Wallet
-                    </button>
+                {!isConnected && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="text-center px-8">
+                      <div className="text-6xl mb-4">🎨</div>
+                      <h2 className="text-2xl font-bold text-white mb-4">
+                        Connect to Start Painting
+                      </h2>
+                      <p className="text-gray-300 mb-6">
+                        Mint colors and join the collaborative canvas
+                      </p>
+                      <ConnectButton />
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -258,7 +258,7 @@ export function PaintPage() {
                         </svg>
                       </div>
                       <button 
-                        onClick={() => openModal()}
+                        onClick={() => router.push('/color')}
                         className="w-[74px] self-center px-2.5 py-1.5 mt-2.5 text-xs font-semibold text-center bg-violet-600 rounded-xl hover:bg-violet-700 transition-colors"
                       >
                         Mint Color
@@ -415,12 +415,6 @@ export function PaintPage() {
         </div>
       </div>
 
-      {/* Wallet Modal */}
-      <WalletModal
-        isOpen={modalState.isOpen}
-        onClose={closeModal}
-        trigger="canvas"
-      />
     </div>
   );
 }

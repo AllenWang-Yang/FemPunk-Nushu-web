@@ -2,10 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount } from 'wagmi';
 import Image from 'next/image';
-import { WalletModal } from '../wallet/WalletModal';
-import { useWalletModal } from '../../lib/hooks/useWalletModal';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 /**
  * GalleryPage Component
@@ -24,8 +22,6 @@ import { useWalletModal } from '../../lib/hooks/useWalletModal';
 
 export function GalleryPage() {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
-  const { modalState, openModal: openWalletModal, closeModal: closeWalletModal } = useWalletModal();
 
   const artworks = [
     {
@@ -161,21 +157,13 @@ export function GalleryPage() {
           </div>
           
           {/* Right side: Connect wallet button */}
-          <button 
-            onClick={isConnected ? () => {} : () => openWalletModal()}
-            className="flex items-center justify-center gap-2.5 w-40 h-10 bg-black/60 border border-white/30 rounded-[10px] font-['Montserrat',sans-serif] font-normal text-base text-white cursor-pointer transition-all hover:bg-black/80 hover:border-white/80 hover:-translate-y-px px-3"
-          >
-            <Image
-              src="/images/homepage/wallet.png"
-              alt=""
-              width={20}
-              height={20}
-              className="flex-shrink-0"
+          <div className="[&_button]:!bg-black/60 [&_button]:!border-white/30 [&_button]:hover:!bg-black/80">
+            <ConnectButton 
+              chainStatus="icon"
+              accountStatus="address"
+              showBalance={false}
             />
-            <span className="whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
-              {isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Connect'}
-            </span>
-          </button>
+          </div>
         </div>
       </nav>
 
@@ -243,8 +231,6 @@ export function GalleryPage() {
         ))}
       </div>
 
-      {/* Wallet Modal */}
-      <WalletModal isOpen={modalState.isOpen} onClose={closeWalletModal} />
     </div>
   );
 }

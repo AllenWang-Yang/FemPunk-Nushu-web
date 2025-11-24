@@ -22,15 +22,19 @@ export const wagmiConfig = createConfig({
   chains,
   connectors: [
     injected(),
-    walletConnect({ 
-      projectId: walletConnectProjectId,
-      metadata: {
-        name: 'FemPunk NüShu',
-        description: 'Web3 协作绘画平台',
-        url: 'https://fempunk-nushu.vercel.app',
-        icons: ['https://fempunk-nushu.vercel.app/favicon.ico']
-      }
-    }),
+    // WalletConnect - 需要有效的 Project ID 才能启用
+    ...(walletConnectProjectId && walletConnectProjectId !== 'demo-project-id-for-local-testing' 
+      ? [walletConnect({ 
+          projectId: walletConnectProjectId,
+          metadata: {
+            name: 'FemPunk NüShu',
+            description: 'Web3 协作绘画平台',
+            url: 'https://fempunk-nushu.vercel.app',
+            icons: ['https://fempunk-nushu.vercel.app/favicon.ico']
+          }
+        })]
+      : []
+    ),
   ],
   transports: {
     [sepolia.id]: fallback([
