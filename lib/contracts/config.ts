@@ -1,6 +1,11 @@
 import { sepolia, mainnet, baseSepolia } from 'viem/chains';
 import { CONTRACT_ADDRESSES, ColorNFTABI, ArtworkNFTABI, FemCanvasABI, FemCanvasRevenueABI } from './abis';
 
+// Export individual contract addresses for easy access
+export const FEM_CANVAS_REVENUE_ADDRESS = CONTRACT_ADDRESSES.sepolia.femCanvasRevenue as `0x${string}`;
+export const FEM_CANVAS_ADDRESS = CONTRACT_ADDRESSES.sepolia.femCanvas as `0x${string}`;
+export const COLOR_NFT_ADDRESS = CONTRACT_ADDRESSES.sepolia.colorNFT as `0x${string}`;
+
 // Network configuration
 export const SUPPORTED_CHAINS = [sepolia, mainnet, baseSepolia] as const;
 
@@ -23,7 +28,10 @@ export const getColorNFTContract = (chainId: number) => {
 
 export const getArtworkNFTContract = (chainId: number) => {
   const isMainnet = chainId === mainnet.id;
-  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : CONTRACT_ADDRESSES.sepolia;
+  const isBaseSepolia = chainId === baseSepolia.id;
+  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : 
+                   isBaseSepolia ? CONTRACT_ADDRESSES.baseSepolia : 
+                   CONTRACT_ADDRESSES.sepolia;
   
   return {
     address: addresses.artworkNFT as `0x${string}`,
@@ -34,7 +42,10 @@ export const getArtworkNFTContract = (chainId: number) => {
 
 export const getFemCanvasContract = (chainId: number) => {
   const isMainnet = chainId === mainnet.id;
-  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : CONTRACT_ADDRESSES.sepolia;
+  const isBaseSepolia = chainId === baseSepolia.id;
+  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : 
+                   isBaseSepolia ? CONTRACT_ADDRESSES.baseSepolia : 
+                   CONTRACT_ADDRESSES.sepolia;
   
   return {
     address: addresses.femCanvas as `0x${string}`,
@@ -45,7 +56,10 @@ export const getFemCanvasContract = (chainId: number) => {
 
 export const getFemCanvasRevenueContract = (chainId: number) => {
   const isMainnet = chainId === mainnet.id;
-  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : CONTRACT_ADDRESSES.sepolia;
+  const isBaseSepolia = chainId === baseSepolia.id;
+  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : 
+                   isBaseSepolia ? CONTRACT_ADDRESSES.baseSepolia : 
+                   CONTRACT_ADDRESSES.sepolia;
   
   return {
     address: addresses.femCanvasRevenue as `0x${string}`,
