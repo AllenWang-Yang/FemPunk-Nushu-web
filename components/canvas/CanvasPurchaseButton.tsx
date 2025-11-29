@@ -53,7 +53,7 @@ export function CanvasPurchaseButton({
       return;
     }
 
-    await purchaseCanvas(canvasId, price);
+    await purchaseCanvas(canvasId, price as bigint);
   };
 
   // 未连接钱包
