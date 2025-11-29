@@ -5,6 +5,41 @@ import { useAccount } from 'wagmi';
 import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import CanvasDetailModal from './CanvasDetailModal';
+import { useUserOwnedColors } from '../../lib/hooks/useColorPurchase';
+
+// My Color Section Component
+function MyColorSection() {
+  const router = useRouter();
+  const { address } = useAccount();
+  const { colors: userColors } = useUserOwnedColors(address);
+
+  return (
+    <div className="flex flex-col self-stretch px-2.5 mt-4 text-white">
+      <div className="object-contain w-full h-px bg-white bg-opacity-10" />
+      <div className="mt-2.5 text-xs">
+        My Color
+      </div>
+      {/* Color preview */}
+      {userColors.length > 0 ? (
+        <div className="mt-2.5 w-8 h-8 rounded-full border-2 border-white self-center" 
+             style={{ backgroundColor: userColors[0].color_code }}>
+        </div>
+      ) : (
+        <div className="mt-2.5 w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center self-center">
+          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+      )}
+      <button 
+        onClick={() => router.push('/color')}
+        className="w-[74px] self-center px-2.5 py-1.5 mt-2.5 text-xs font-semibold text-center bg-violet-600 rounded-xl hover:bg-violet-700 transition-colors"
+      >
+        Mint Color
+      </button>
+    </div>
+  );
+}
 
 /**
  * PaintPage Component
@@ -254,24 +289,7 @@ export function PaintPage() {
                       - Displays color preview (locked until minted)
                       - Mint Color button to purchase colors
                     */}
-                    <div className="flex flex-col self-stretch px-2.5 mt-4 text-white">
-                      <div className="object-contain w-full h-px bg-white bg-opacity-10" />
-                      <div className="mt-2.5 text-xs">
-                        My Color
-                      </div>
-                      {/* Color preview - locked state */}
-                      <div className="mt-2.5 w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center self-center">
-                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                      </div>
-                      <button 
-                        onClick={() => router.push('/color')}
-                        className="w-[74px] self-center px-2.5 py-1.5 mt-2.5 text-xs font-semibold text-center bg-violet-600 rounded-xl hover:bg-violet-700 transition-colors"
-                      >
-                        Mint Color
-                      </button>
-                    </div>
+                    <MyColorSection />
 
                     {/* Divider with flexible spacing */}
                     <div className="object-contain self-stretch mt-auto mb-3 w-full h-px bg-white bg-opacity-10 max-md:mt-10" />

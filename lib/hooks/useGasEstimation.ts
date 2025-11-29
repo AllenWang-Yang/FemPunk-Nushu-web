@@ -53,7 +53,8 @@ export function useGasEstimation() {
 
   // Estimate gas for color purchase
   const estimateColorPurchase = useCallback(async (
-    colorHex: string,
+    colorId: number,
+    metadataURI: string,
     priceInEth: string
   ): Promise<GasEstimate> => {
     if (!publicClient || !address || !chainId) {
@@ -65,8 +66,8 @@ export function useGasEstimation() {
     try {
       const gasLimit = await publicClient.estimateContractGas({
         ...contract,
-        functionName: 'purchaseColor',
-        args: [colorHex],
+        functionName: 'buyColor',
+        args: [BigInt(colorId), metadataURI],
         value: parseEther(priceInEth),
         account: address as Address,
       });
@@ -146,48 +147,23 @@ export function useGasEstimation() {
   }, [publicClient, address, chainId, gasPrice]);
 
   // Estimate gas for redemption
+  // Note: Redemption is handled off-chain, this is kept for backward compatibility
   const estimateRedemption = useCallback(async (
     redemptionCode: string
   ): Promise<GasEstimate> => {
-    if (!publicClient || !address || !chainId) {
-      throw new Error('钱包未连接');
-    }
-
-    const contract = getColorNFTContract(chainId);
+    // Redemption is handled via backend API, return minimal gas estimate
+    const gasLimit = GAS_LIMITS.redeemColor;
+    const totalCost = gasLimit * gasPrice;
     
-    try {
-      const gasLimit = await publicClient.estimateContractGas({
-        ...contract,
-        functionName: 'redeemColor',
-        args: [redemptionCode],
-        account: address as Address,
-      });
-
-      const totalCost = gasLimit * gasPrice;
-      
-      return {
-        gasLimit,
-        gasPrice,
-        totalCost,
-        totalCostEth: formatEther(totalCost),
-        isLoading: false,
-        error: null,
-      };
-    } catch (err) {
-      // Fallback to predefined gas limit
-      const gasLimit = GAS_LIMITS.redeemColor;
-      const totalCost = gasLimit * gasPrice;
-      
-      return {
-        gasLimit,
-        gasPrice,
-        totalCost,
-        totalCostEth: formatEther(totalCost),
-        isLoading: false,
-        error: '使用预估 Gas 费用',
-      };
-    }
-  }, [publicClient, address, chainId, gasPrice]);
+    return {
+      gasLimit,
+      gasPrice,
+      totalCost,
+      totalCostEth: formatEther(totalCost),
+      isLoading: false,
+      error: 'Redemption handled off-chain',
+    };
+  }, [gasPrice]);
 
   // Get gas price in different units
   const getGasPriceInfo = useCallback(() => {

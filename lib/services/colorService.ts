@@ -30,11 +30,36 @@ export interface RewardColorParams {
 }
 
 /**
+ * 根据颜色代码查找颜色
+ */
+export async function getColorByCode(colorCode: string): Promise<Color | null> {
+  try {
+    const response = await fetchWithTimeout(`/api/colors`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch colors: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch colors');
+    }
+    
+    const colors = data.colors || [];
+    return colors.find((color: Color) => color.color_code === colorCode) || null;
+  } catch (error) {
+    console.error('Error fetching color by code:', error);
+    return null;
+  }
+}
+
+/**
  * 获取所有颜色列表
  */
 export async function getAllColors(): Promise<Color[]> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/colors`);
+    const response = await fetchWithTimeout(`/api/colors`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch colors: ${response.statusText}`);
@@ -49,7 +74,7 @@ export async function getAllColors(): Promise<Color[]> {
     return data.colors || [];
   } catch (error) {
     console.error('Error fetching colors:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -58,7 +83,7 @@ export async function getAllColors(): Promise<Color[]> {
  */
 export async function recordColorPurchase(params: RecordPurchaseParams): Promise<void> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/colors/recordPurchase`, {
+    const response = await fetchWithTimeout(`/api/colors/recordPurchase`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -86,7 +111,7 @@ export async function recordColorPurchase(params: RecordPurchaseParams): Promise
  */
 export async function getUserColors(address: string): Promise<Color[]> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/colors/owner/${address}`);
+    const response = await fetchWithTimeout(`/api/colors/owner/${address}`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch user colors: ${response.statusText}`);
@@ -101,7 +126,7 @@ export async function getUserColors(address: string): Promise<Color[]> {
     return data.colors || [];
   } catch (error) {
     console.error('Error fetching user colors:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -110,7 +135,7 @@ export async function getUserColors(address: string): Promise<Color[]> {
  */
 export async function rewardColor(params: RewardColorParams): Promise<{ txHash: string; color_code: string }> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/colors/reward`, {
+    const response = await fetchWithTimeout(`/api/colors/reward`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

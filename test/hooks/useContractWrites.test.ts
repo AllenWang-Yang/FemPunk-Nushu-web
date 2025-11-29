@@ -15,7 +15,7 @@ vi.mock('../../lib/contracts/config', () => ({
     address: '0x1234567890123456789012345678901234567890',
     abi: [
       {
-        name: 'purchaseColor',
+        name: 'buyColor',
         type: 'function',
         inputs: [
           { name: 'colorHex', type: 'string' },
@@ -70,21 +70,22 @@ describe('useContractWrites hooks', () => {
     it('should purchase color with correct parameters', async () => {
       const { result } = renderHook(() => usePurchaseColor());
 
-      await result.current.purchaseColor('#FF0000', '1');
+      await result.current.purchaseColor(1, 'ipfs://color-1-FF0000', '1');
 
       expect(mockWriteContract).toHaveBeenCalledWith({
         address: '0x1234567890123456789012345678901234567890',
         abi: expect.any(Array),
-        functionName: 'purchaseColor',
-        args: ['#FF0000', '1'],
+        functionName: 'buyColor',
+        args: [BigInt(1), 'ipfs://color-1-FF0000'],
         value: expect.any(BigInt),
+        gas: expect.any(BigInt),
       });
     });
 
     it('should handle multiple color purchases', async () => {
       const { result } = renderHook(() => usePurchaseColor());
 
-      await result.current.purchaseColor('#FF0000', '2');
+      await result.current.purchaseColor(1, 'ipfs://color-1-FF0000', '2');
 
       expect(mockWriteContract).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -380,7 +381,7 @@ describe('useContractWrites hooks', () => {
 
       // Reset and retry
       result.current.reset();
-      await result.current.purchaseColor('#FF0000', '1');
+      await result.current.purchaseColor(1, 'ipfs://color-1-FF0000', '1');
 
       expect(mockReset).toHaveBeenCalledTimes(1);
       expect(mockWriteContract).toHaveBeenCalledTimes(1);

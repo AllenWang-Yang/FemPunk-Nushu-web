@@ -1,5 +1,5 @@
 import { createConfig, http, fallback } from 'wagmi';
-import { sepolia, mainnet } from 'wagmi/chains';
+import { sepolia, mainnet, baseSepolia } from 'wagmi/chains';
 import { injected, walletConnect } from 'wagmi/connectors';
 
 // Get environment variables
@@ -15,7 +15,7 @@ if (!alchemyApiKey) {
 }
 
 // Configure supported chains
-const chains = [sepolia, mainnet] as const;
+const chains = [baseSepolia, sepolia, mainnet] as const;
 
 // Create wagmi config with minimal connectors
 export const wagmiConfig = createConfig({
@@ -37,6 +37,11 @@ export const wagmiConfig = createConfig({
     ),
   ],
   transports: {
+    [baseSepolia.id]: fallback([
+      http('https://sepolia.base.org'),
+      http('https://base-sepolia.g.alchemy.com/v2/demo'),
+      http('https://base-sepolia.publicnode.com'),
+    ]),
     [sepolia.id]: fallback([
       ...(alchemyApiKey ? [http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`)] : []),
       http('https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'),

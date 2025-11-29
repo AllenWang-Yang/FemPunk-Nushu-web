@@ -5,20 +5,21 @@ import { useAccount } from "wagmi";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import ColorWheel from "./ColorWheel";
 import { useColorPurchase, useUserOwnedColors, useColorPrice } from "../../lib/hooks/useColorPurchase";
-import { rewardColor } from "../../lib/services/colorService";
+import { rewardColor, getColorByCode } from "../../lib/services/colorService";
 
 function MintColorPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const [invitationCode, setInvitationCode] = React.useState("");
   const [selectedColor, setSelectedColor] = React.useState("#AD4AFF");
+  const [colorError, setColorError] = React.useState("");
   const [isRedeeming, setIsRedeeming] = React.useState(false);
 
   // 使用颜色购买 hook
   const { isPurchasing, isSuccess, error, purchaseColor, reset } = useColorPurchase();
   
   // 获取用户拥有的颜色
-  const { colors: userColors, refetch: refetchUserColors } = useUserOwnedColors();
+  const { colors: userColors, refetch: refetchUserColors } = useUserOwnedColors(address);
   
   // 获取颜色价格
   const { priceInEth, isLoading: isPriceLoading } = useColorPrice();
@@ -54,12 +55,28 @@ function MintColorPage() {
       return;
     }
 
+    if (!selectedColor.match(/^#[0-9A-Fa-f]{6}$/)) {
+      setColorError('Please enter a valid color code (e.g., #AD4AFF)');
+      return;
+    }
+
     try {
-      // 生成一个临时的 colorId（实际应该从后端获取可用的颜色ID）
-      const colorId = Math.floor(Math.random() * 1000000) + 1;
+      // 先查找数据库中是否有这个颜色代码
+      const existingColor = await getColorByCode(selectedColor);
       
-      // 生成 metadata URI（实际应该上传到 IPFS）
-      const metadataURI = `ipfs://color-${colorId}-${selectedColor.replace('#', '')}`;
+      let colorId: number;
+      let metadataURI: string;
+      
+      if (existingColor) {
+        // 使用数据库中的数据
+        colorId = existingColor.color_id;
+        metadataURI = existingColor.metadata_uri;
+        console.log('Found existing color:', existingColor);
+      } else {
+        // 数据库中找不到该颜色，报错
+        setColorError('暂时无法铸造该颜色');
+        return;
+      }
       
       await purchaseColor(colorId, metadataURI);
     } catch (err) {
@@ -216,10 +233,30 @@ function MintColorPage() {
             </svg>
           </div>
           <div className="absolute rounded-xl border border-solid border-white border-opacity-30 h-[46px] left-[866px] top-[181px] w-[121px] max-md:left-2/4 max-md:ml-14 max-md:-translate-x-2/4 max-md:top-[497px] max-sm:ml-10 max-sm:h-10 max-sm:top-[407px] max-sm:w-[100px]">
-            <div className="absolute top-3 left-4 text-base text-white h-[22px] w-[70px] max-sm:top-2.5 max-sm:left-3 max-sm:text-sm">
-              {selectedColor}
-            </div>
+            <input
+              type="text"
+              value={selectedColor}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.match(/^#[0-9A-Fa-f]{0,6}$/)) {
+                  setSelectedColor(value);
+                  setColorError('');
+                } else if (value === '') {
+                  setSelectedColor('');
+                  setColorError('');
+                } else {
+                  setColorError('Invalid color format. Use #RRGGBB');
+                }
+              }}
+              placeholder="#AD4AFF"
+              className="absolute top-3 left-4 text-base text-white h-[22px] w-[70px] max-sm:top-2.5 max-sm:left-3 max-sm:text-sm bg-transparent border-none outline-none placeholder-white/50"
+            />
           </div>
+          {colorError && (
+            <div className="absolute text-xs text-red-400 left-[866px] top-[235px] w-[200px] max-md:left-2/4 max-md:-translate-x-2/4 max-md:top-[551px] max-sm:top-[455px]">
+              {colorError}
+            </div>
+          )}
           <div className="absolute h-5 text-base font-medium text-center text-white left-[810px] top-[248px] w-[45px] max-md:left-2/4 max-md:ml-0 max-md:-translate-x-2/4 max-md:top-[563px] max-sm:ml-0 max-sm:text-sm max-sm:top-[467px]">
             Price:
           </div>

@@ -3,9 +3,9 @@
  */
 
 import React, { useState } from 'react';
-import { useAccount, useWriteContract, useReadContract } from 'wagmi';
+import { useAccount, useWriteContract, useReadContract, useChainId } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
-import { FemCanvasABI } from '../contracts/abis';
+import { getFemCanvasContract } from '../contracts/config';
 import { 
   recordCanvasPurchase, 
   getAllCanvas, 
@@ -13,9 +13,6 @@ import {
   getCanvasByDay,
   type Canvas 
 } from '../services/canvasService';
-
-// 合约地址 - 从环境变量读取
-const CANVAS_CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_CANVAS_CONTRACT_ADDRESS || '0xC23dbB6a6d2616864a813dA42eFCe4Db86867410') as `0x${string}`;
 
 export interface UseCanvasPurchaseResult {
   // 状态
@@ -34,15 +31,17 @@ export interface UseCanvasPurchaseResult {
  */
 export function useCanvasPurchase(): UseCanvasPurchaseResult {
   const { address } = useAccount();
+  const chainId = useChainId();
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
 
   const { writeContractAsync } = useWriteContract();
+  const contract = chainId ? getFemCanvasContract(chainId) : null;
 
   const purchaseCanvas = async (canvasId: bigint, price?: bigint) => {
-    if (!address) {
+    if (!address || !contract) {
       setError(new Error('Please connect your wallet'));
       return;
     }
@@ -60,8 +59,7 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
       console.log('Purchasing canvas:', { canvasId, price: purchasePrice });
       
       const hash = await writeContractAsync({
-        address: CANVAS_CONTRACT_ADDRESS,
-        abi: FemCanvasABI,
+        ...contract,
         functionName: 'buyCanvas',
         args: [canvasId],
         value: purchasePrice,
@@ -71,7 +69,7 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
       setTxHash(hash);
 
       // 等待交易确认
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 5000));
 
       // 调用后端记录购买
       console.log('Recording canvas purchase to backend...');
@@ -185,11 +183,16 @@ export function useCanvasById(canvasId?: string) {
  * 获取画布价格的 Hook
  */
 export function useCanvasPrice(canvasId?: bigint) {
+  const chainId = useChainId();
+  const contract = chainId ? getFemCanvasContract(chainId) : null;
+  
   const { data: price, isLoading, error } = useReadContract({
-    address: CANVAS_CONTRACT_ADDRESS,
-    abi: FemCanvasABI,
+    ...contract,
     functionName: 'canvasPrice',
     args: canvasId ? [canvasId] : undefined,
+    query: {
+      enabled: !!contract && !!canvasId,
+    },
   });
 
   return {
@@ -205,12 +208,16 @@ export function useCanvasPrice(canvasId?: bigint) {
  */
 export function useCanvasPurchaseInfo(canvasId?: bigint) {
   const { address } = useAccount();
+  const chainId = useChainId();
+  const contract = chainId ? getFemCanvasContract(chainId) : null;
   
   const { data, isLoading, error } = useReadContract({
-    address: CANVAS_CONTRACT_ADDRESS,
-    abi: FemCanvasABI,
+    ...contract,
     functionName: 'getCanvasPurchaseInfo',
     args: canvasId ? [canvasId] : undefined,
+    query: {
+      enabled: !!contract && !!canvasId,
+    },
   });
 
   // data 返回: [price, minted, remaining, userHasMinted]
@@ -233,12 +240,16 @@ export function useCanvasPurchaseInfo(canvasId?: bigint) {
  */
 export function useHasPurchasedCanvas(canvasId?: bigint) {
   const { address } = useAccount();
+  const chainId = useChainId();
+  const contract = chainId ? getFemCanvasContract(chainId) : null;
   
   const { data: balance, isLoading } = useReadContract({
-    address: CANVAS_CONTRACT_ADDRESS,
-    abi: FemCanvasABI,
+    ...contract,
     functionName: 'balanceOf',
     args: address && canvasId ? [address as `0x${string}`, canvasId] : undefined,
+    query: {
+      enabled: !!contract && !!address && !!canvasId,
+    },
   });
 
   return {

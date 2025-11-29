@@ -4,6 +4,7 @@ import { parseEther, formatEther } from 'viem';
 import { getFemCanvasRevenueContract, GAS_LIMITS } from '../contracts/config';
 import { trackWeb3Error } from '../monitoring/sentry';
 import { ErrorHandlerService } from '../services/errorHandler';
+import { recordRevenueClaim } from '../services/revenueService';
 
 // Hook for sending revenue to contract
 export const useSendRevenue = () => {
@@ -94,7 +95,6 @@ export const useClaimRevenue = () => {
   });
 
   const claimRevenue = async (canvasId: number) => {
-    canvasId = 4122776673090566;
     if (!address || !chainId) {
       setError('请先连接钱包');
       return;
@@ -106,12 +106,32 @@ export const useClaimRevenue = () => {
 
       const contract = getFemCanvasRevenueContract(chainId);
 
-      await writeContract({
+      // 调用合约提取收益
+      console.log('Claiming revenue for canvas:', canvasId);
+      const txHash = await writeContract({
         ...contract,
         functionName: 'claimRevenue',
         args: [BigInt(canvasId)],
         gas: GAS_LIMITS.claimRevenue,
       });
+
+      // 等待交易确认
+      if (txHash) {
+        console.log('Revenue claim transaction sent:', txHash);
+        
+        // 等待一段时间让交易上链
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // 调用后端记录提取
+        console.log('Recording revenue claim to backend...');
+        await recordRevenueClaim({
+          contributor: address,
+          canvas_id: canvasId.toString(),
+          tx_hash: txHash,
+        });
+        
+        console.log('Revenue claim recorded successfully');
+      }
 
     } catch (err: any) {
       console.error('Claim revenue error:', err);

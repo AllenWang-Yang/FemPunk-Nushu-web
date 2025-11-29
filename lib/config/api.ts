@@ -3,8 +3,8 @@
  * 统一管理后端 URL 和 API 相关配置
  */
 
-// 后端服务 URL - 从环境变量读取，生产环境使用已部署的后端
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://fempunk-nushu-service.onrender.com';
+// 后端服务 URL - 统一使用代理
+export const BACKEND_URL = '';
 
 // API 超时配置（毫秒）
 export const API_TIMEOUT = 30000; // 30秒

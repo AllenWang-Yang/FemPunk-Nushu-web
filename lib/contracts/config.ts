@@ -1,15 +1,18 @@
-import { sepolia, mainnet } from 'viem/chains';
-import { CONTRACT_ADDRESSES, ColorNFTABI, ArtworkNFTABI, FemCanvasRevenueABI } from './abis';
+import { sepolia, mainnet, baseSepolia } from 'viem/chains';
+import { CONTRACT_ADDRESSES, ColorNFTABI, ArtworkNFTABI, FemCanvasABI, FemCanvasRevenueABI } from './abis';
 
 // Network configuration
-export const SUPPORTED_CHAINS = [sepolia, mainnet] as const;
+export const SUPPORTED_CHAINS = [sepolia, mainnet, baseSepolia] as const;
 
-export const DEFAULT_CHAIN = sepolia; // Development default
+export const DEFAULT_CHAIN = baseSepolia; // Development default
 
 // Contract configurations per network
 export const getColorNFTContract = (chainId: number) => {
   const isMainnet = chainId === mainnet.id;
-  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : CONTRACT_ADDRESSES.sepolia;
+  const isBaseSepolia = chainId === baseSepolia.id;
+  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : 
+                   isBaseSepolia ? CONTRACT_ADDRESSES.baseSepolia : 
+                   CONTRACT_ADDRESSES.sepolia;
   
   return {
     address: addresses.colorNFT as `0x${string}`,
@@ -25,6 +28,17 @@ export const getArtworkNFTContract = (chainId: number) => {
   return {
     address: addresses.artworkNFT as `0x${string}`,
     abi: ArtworkNFTABI,
+    chainId,
+  };
+};
+
+export const getFemCanvasContract = (chainId: number) => {
+  const isMainnet = chainId === mainnet.id;
+  const addresses = isMainnet ? CONTRACT_ADDRESSES.mainnet : CONTRACT_ADDRESSES.sepolia;
+  
+  return {
+    address: addresses.femCanvas as `0x${string}`,
+    abi: FemCanvasABI,
     chainId,
   };
 };

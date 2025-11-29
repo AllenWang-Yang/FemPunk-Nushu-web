@@ -30,7 +30,7 @@ export interface RecordCanvasPurchaseParams {
  */
 export async function getAllCanvas(): Promise<Canvas> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/canvas`);
+    const response = await fetchWithTimeout(`/api/canvas`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch canvas: ${response.statusText}`);
@@ -54,7 +54,7 @@ export async function getAllCanvas(): Promise<Canvas> {
  */
 export async function getCanvasByDay(dayTimestamp: number): Promise<Canvas> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/canvas/${dayTimestamp}`);
+    const response = await fetchWithTimeout(`/api/canvas/${dayTimestamp}`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch canvas: ${response.statusText}`);
@@ -78,7 +78,7 @@ export async function getCanvasByDay(dayTimestamp: number): Promise<Canvas> {
  */
 export async function getCanvasById(canvasId: string): Promise<Canvas> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/canvas/id/${canvasId}`);
+    const response = await fetchWithTimeout(`/api/canvas/id/${canvasId}`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch canvas: ${response.statusText}`);
@@ -102,7 +102,7 @@ export async function getCanvasById(canvasId: string): Promise<Canvas> {
  */
 export async function recordCanvasPurchase(params: RecordCanvasPurchaseParams): Promise<void> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/canvas/purchase`, {
+    const response = await fetchWithTimeout(`/api/canvas/purchase`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ export async function createCanvas(params: {
   creator?: string;
 }): Promise<{ canvasId: string }> {
   try {
-    const response = await fetchWithTimeout(`${BACKEND_URL}/api/canvas/create`, {
+    const response = await fetchWithTimeout(`/api/canvas/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

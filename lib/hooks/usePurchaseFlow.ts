@@ -177,7 +177,8 @@ export function usePurchaseFlow(): PurchaseFlowHooks {
         for (const colorId of state.selectedColors) {
           const colorHex = getColorHexById(colorId);
           if (colorHex) {
-            await purchaseColor(colorHex, formatEther(priceInWei));
+            const metadataURI = `ipfs://color-${colorId}-${colorHex.replace('#', '')}`;
+            await purchaseColor(Number(colorId), metadataURI, formatEther(priceInWei));
             purchasedColors.push(colorId);
           }
         }

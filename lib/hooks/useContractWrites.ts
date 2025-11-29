@@ -15,7 +15,7 @@ export function usePurchaseColor() {
     hash,
   });
 
-  const purchaseColor = async (colorHex: string, priceInEth: string) => {
+  const purchaseColor = async (colorId: number, metadataURI: string, priceInEth: string) => {
     if (!contract) throw new Error('Contract not available');
     
     setIsConfirming(true);
@@ -23,8 +23,8 @@ export function usePurchaseColor() {
     try {
       await writeContract({
         ...contract,
-        functionName: 'purchaseColor',
-        args: [colorHex],
+        functionName: 'buyColor',
+        args: [BigInt(colorId), metadataURI],
         value: parseEther(priceInEth),
         gas: GAS_LIMITS.purchaseColor,
       });
@@ -45,6 +45,8 @@ export function usePurchaseColor() {
 }
 
 // Hook for redeeming color with code
+// Note: Redemption is handled off-chain via the backend API
+// The rewardColor function in the contract is owner-only and called by the backend
 export function useRedeemColor() {
   const chainId = useChainId();
   const { writeContract, data: hash, isPending, error } = useWriteContract();
@@ -55,15 +57,10 @@ export function useRedeemColor() {
     hash,
   });
 
+  // This function is kept for backward compatibility but should not be used directly
+  // Use the backend API endpoint for redemption instead
   const redeemColor = async (redemptionCode: string) => {
-    if (!contract) throw new Error('Contract not available');
-    
-    await writeContract({
-      ...contract,
-      functionName: 'redeemColor',
-      args: [redemptionCode],
-      gas: GAS_LIMITS.redeemColor,
-    });
+    throw new Error('Direct redemption not supported. Use backend API endpoint instead.');
   };
 
   return {

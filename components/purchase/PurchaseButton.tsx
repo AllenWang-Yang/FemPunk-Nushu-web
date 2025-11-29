@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import { formatEther } from 'viem';
 import { Button } from '../ui/Button';
 import { useWallet } from '../../lib/context/WalletContext';
-import { usePurchaseColor } from '../../lib/hooks/useContractWrites';
-import { useCurrentColorPrice } from '../../lib/hooks/useColorNFTs';
+import { useColorPurchase } from '../../lib/hooks/useColorPurchase';
 import { getColorById } from '../../lib/constants/colors';
 
 interface PurchaseButtonProps {
@@ -22,9 +21,17 @@ export function PurchaseButton({
   className 
 }: PurchaseButtonProps) {
   const { isConnected, connect } = useWallet();
-  const { currentPrice } = useCurrentColorPrice();
-  const { purchaseColor, isPending, isConfirming, isSuccess, error } = usePurchaseColor();
+  const { 
+    isPurchasing: isPending, 
+    isSuccess, 
+    error, 
+    purchaseColor
+  } = useColorPurchase();
+  
+  const colorPriceInEth = '0.001';
+  const currentPrice = BigInt('1000000000000000'); // 0.001 ETH in wei
   const [purchasingIndex, setPurchasingIndex] = useState<number>(-1);
+  const isConfirming = false; // 简化状态管理
 
   const totalPrice = (currentPrice as bigint) * BigInt(selectedColors.length);
   const isDisabled = selectedColors.length === 0 || isPending || isConfirming;
@@ -49,7 +56,8 @@ export function PurchaseButton({
         const colorHex = getColorHexById(colorId);
         
         if (colorHex) {
-          await purchaseColor(colorHex, formatEther(currentPrice as bigint));
+          const metadataURI = `ipfs://color-${colorId}-${colorHex.replace('#', '')}`;
+          await purchaseColor(Number(colorId), metadataURI);
         }
       }
       
@@ -98,7 +106,7 @@ export function PurchaseButton({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">单价:</span>
-            <span className="font-medium">{formatEther(currentPrice as bigint)} ETH</span>
+            <span className="font-medium">{colorPriceInEth} ETH</span>
           </div>
           <div className="flex justify-between items-center text-lg font-semibold border-t border-purple-200 pt-2">
             <span>总计:</span>
