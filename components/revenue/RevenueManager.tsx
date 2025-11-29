@@ -138,7 +138,7 @@ export function RevenueModal({ isOpen, onClose, canvasId, mode }: RevenueModalPr
 
                   {sendError && (
                     <ErrorAlert 
-                      error={sendError} 
+                      error={sendError?.message || sendError?.toString() || 'Transaction failed'} 
                       onDismiss={() => {
                         // Clear error after user reads it
                       }}
@@ -185,7 +185,7 @@ export function RevenueModal({ isOpen, onClose, canvasId, mode }: RevenueModalPr
 
                   {claimError && (
                     <ErrorAlert 
-                      error={claimError} 
+                      error={claimError?.message || claimError?.toString() || 'Transaction failed'} 
                       onDismiss={() => {
                         // Clear error after user reads it
                       }}

@@ -1,17 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter, Montserrat } from 'next/font/google';
 import './globals.css';
 import { Web3Provider } from '../lib/providers/Web3Provider';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { GlobalErrorDisplay, OfflineIndicator, GlobalLoadingOverlay } from '../components/ui/GlobalErrorDisplay';
 import { ClientOnly } from '../components/ui/ClientOnly';
+import { montserrat } from '../lib/fonts';
 
-const inter = Inter({ subsets: ['latin'] });
-const montserrat = Montserrat({ 
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-  display: 'swap',
-});
+// 临时使用系统字体
+const inter = { className: 'font-system' };
 
 export const metadata: Metadata = {
   title: 'FemPunk NüShu - Web3 协作绘画平台',

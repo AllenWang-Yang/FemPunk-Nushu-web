@@ -1,8 +1,5 @@
-import { Montserrat } from 'next/font/google';
-
-export const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+// 临时使用系统字体避免网络请求问题
+export const montserrat = {
   variable: '--font-montserrat',
-  display: 'swap',
-});
+  className: 'font-system',
+};
