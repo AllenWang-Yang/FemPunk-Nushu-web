@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
 import { FEM_CANVAS_REVENUE_ADDRESS } from '../contracts/config';
-import { femCanvasRevenueABI } from '../contracts/abis/FemCanvasRevenue';
+import { FemCanvasRevenueABI } from '../contracts/abis/FemCanvasRevenue';
 
 // Hook for sending revenue to contract
 export function useSendRevenue() {
@@ -35,7 +35,7 @@ export function useSendRevenue() {
     try {
       await writeContract({
         address: FEM_CANVAS_REVENUE_ADDRESS,
-        abi: femCanvasRevenueABI,
+        abi: FemCanvasRevenueABI,
         functionName: 'receiveRevenue',
         args: [BigInt(canvasId)],
         value: parseEther(amount),
@@ -84,7 +84,7 @@ export function useClaimRevenue() {
     try {
       await writeContract({
         address: FEM_CANVAS_REVENUE_ADDRESS,
-        abi: femCanvasRevenueABI,
+        abi: FemCanvasRevenueABI,
         functionName: 'claimRevenue',
         args: [BigInt(canvasId)],
       });
@@ -109,7 +109,7 @@ export function useClaimableAmount(canvasId: number) {
   
   const { data, isLoading, error } = useReadContract({
     address: FEM_CANVAS_REVENUE_ADDRESS,
-    abi: femCanvasRevenueABI,
+    abi: FemCanvasRevenueABI,
     functionName: 'getClaimableAmount',
     args: [BigInt(canvasId), address as `0x${string}`],
     query: {
@@ -131,7 +131,7 @@ export function useClaimableAmount(canvasId: number) {
 export function useCanvasRevenueStatus(canvasId: number) {
   const { data, isLoading, error } = useReadContract({
     address: FEM_CANVAS_REVENUE_ADDRESS,
-    abi: femCanvasRevenueABI,
+    abi: FemCanvasRevenueABI,
     functionName: 'getCanvasRevenueStatus',
     args: [BigInt(canvasId)],
     query: {
@@ -164,7 +164,7 @@ export function useContributorInfo(canvasId: number, contributorAddress?: string
   
   const { data, isLoading, error } = useReadContract({
     address: FEM_CANVAS_REVENUE_ADDRESS,
-    abi: femCanvasRevenueABI,
+    abi: FemCanvasRevenueABI,
     functionName: 'claimableAmount',
     args: [BigInt(canvasId), targetAddress as `0x${string}`],
     query: {

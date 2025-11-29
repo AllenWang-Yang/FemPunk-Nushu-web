@@ -76,7 +76,7 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
 }
 
 // 简化的价格Hook
-export function useCanvasPrice() {
+export function useCanvasPrice(canvasId?: bigint) {
   return {
     price: parseEther('0.0018'),
     priceInEth: '0.0018',
@@ -86,7 +86,7 @@ export function useCanvasPrice() {
 }
 
 // 简化的购买信息Hook
-export function useCanvasPurchaseInfo() {
+export function useCanvasPurchaseInfo(canvasId?: bigint) {
   return {
     purchaseInfo: {
       price: parseEther('0.0018'),
@@ -100,7 +100,7 @@ export function useCanvasPurchaseInfo() {
 }
 
 // 简化的购买状态Hook
-export function useHasPurchasedCanvas() {
+export function useHasPurchasedCanvas(canvasId?: bigint) {
   return {
     hasPurchased: false,
     balance: 0n,
