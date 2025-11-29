@@ -2,7 +2,7 @@
  * 画布购买 Hook - 简化版本
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAccount, useWriteContract, useChainId } from 'wagmi';
 import { parseEther } from 'viem';
 import { getFemCanvasContract } from '../contracts/config';
@@ -105,5 +105,50 @@ export function useHasPurchasedCanvas() {
     hasPurchased: false,
     balance: 0n,
     isLoading: false,
+  };
+}
+
+// 当前画布信息Hook
+export function useCurrentCanvas() {
+  const [canvas, setCanvas] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchCanvas = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // 模拟获取当前画布数据
+      const mockCanvas = {
+        canvas_id: '1',
+        day_timestamp: Date.now(),
+        total_raised_wei: '1800000000000000', // 0.0018 ETH
+        finalized: false,
+        metadata_uri: '/images/homepage/spring.png',
+      };
+      
+      setCanvas(mockCanvas);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch canvas'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refetch = () => {
+    fetchCanvas();
+  };
+
+  // 初始加载
+  React.useEffect(() => {
+    fetchCanvas();
+  }, []);
+
+  return {
+    canvas,
+    isLoading,
+    error,
+    refetch,
   };
 }
