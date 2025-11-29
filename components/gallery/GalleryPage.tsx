@@ -142,7 +142,7 @@ export function GalleryPage() {
                 PAINT
               </button>
               <button
-                onClick={() => handleNavigation('/buy')}
+                onClick={() => handleNavigation('/color')}
                 className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
               >
                 COLOR
@@ -152,6 +152,12 @@ export function GalleryPage() {
                 className="font-['Montserrat',sans-serif] font-extrabold text-[18px] leading-normal uppercase text-[#1ee11f] bg-transparent border-none cursor-pointer transition-all hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
               >
                 GALLERY
+              </button>
+              <button
+                onClick={() => handleNavigation('/my-paints')}
+                className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
+              >
+                MY PAINTS
               </button>
             </nav>
           </div>

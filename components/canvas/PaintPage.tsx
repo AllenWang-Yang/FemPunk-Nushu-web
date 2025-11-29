@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAccount } from 'wagmi';
 import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import CanvasDetailModal from './CanvasDetailModal';
 
 /**
  * PaintPage Component
@@ -32,6 +33,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 export function PaintPage() {
   const router = useRouter();
   const { isConnected } = useAccount();
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = React.useState(false);
 
   return (
     <div className="relative overflow-hidden bg-[#161616] min-h-screen">
@@ -94,6 +96,12 @@ export function PaintPage() {
                 className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
               >
                 GALLERY
+              </button>
+              <button
+                onClick={() => router.push("/my-paints")}
+                className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
+              >
+                MY PAINTS
               </button>
             </nav>
           </div>
@@ -299,11 +307,15 @@ export function PaintPage() {
                         </svg>
                       </button>
                     </div>
-                    <button className="w-[74px] flex gap-2 items-center justify-center mt-2.5 px-3 py-2 bg-violet-600 rounded-xl hover:bg-violet-700 transition-colors">
+                    <button 
+                      onClick={() => setIsPurchaseModalOpen(true)}
+                      className="w-[74px] flex gap-2 items-center justify-center mt-2.5 px-3 py-2 bg-green-600 rounded-xl hover:bg-green-700 transition-colors"
+                      title="Purchase Canvas NFT"
+                    >
                       <svg className="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
-                      <span className="text-xs font-semibold text-white">Save</span>
+                      <span className="text-xs font-semibold text-white">Buy</span>
                     </button>
                   </div>
                 </div>
@@ -415,6 +427,11 @@ export function PaintPage() {
         </div>
       </div>
 
+      {/* 画布购买弹窗 */}
+      <CanvasDetailModal 
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+      />
     </div>
   );
 }

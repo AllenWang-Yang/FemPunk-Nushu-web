@@ -21,6 +21,7 @@ const navigationItems: NavigationItem[] = [
   { label: 'PAINT', path: '/canvas', key: 'paint' },
   { label: 'COLOR', path: '/color', key: 'color' },
   { label: 'GALLERY', path: '/gallery', key: 'gallery' },
+  { label: 'MY PAINTS', path: '/my-paints', key: 'my-paints' },
 ];
 
 export function SharedNavigation({ className, variant = 'default' }: SharedNavigationProps) {
@@ -35,6 +36,7 @@ export function SharedNavigation({ className, variant = 'default' }: SharedNavig
     if (pathname === '/canvas') return 'paint';
     if (pathname === '/color') return 'color';
     if (pathname === '/gallery') return 'gallery';
+    if (pathname === '/my-paints') return 'my-paints';
     return '';
   };
 

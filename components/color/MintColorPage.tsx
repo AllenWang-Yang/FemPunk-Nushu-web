@@ -4,41 +4,105 @@ import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import ColorWheel from "./ColorWheel";
+import { useColorPurchase, useUserOwnedColors, useColorPrice } from "../../lib/hooks/useColorPurchase";
+import { rewardColor } from "../../lib/services/colorService";
 
 function MintColorPage() {
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const [invitationCode, setInvitationCode] = React.useState("");
   const [selectedColor, setSelectedColor] = React.useState("#AD4AFF");
+  const [isRedeeming, setIsRedeeming] = React.useState(false);
+
+  // 使用颜色购买 hook
+  const { isPurchasing, isSuccess, error, purchaseColor, reset } = useColorPurchase();
+  
+  // 获取用户拥有的颜色
+  const { colors: userColors, refetch: refetchUserColors } = useUserOwnedColors();
+  
+  // 获取颜色价格
+  const { priceInEth, isLoading: isPriceLoading } = useColorPrice();
 
   const handleNavigation = (path: string) => {
     router.push(path);
   };
 
-  const handleMintColor = () => {
+  // 处理购买成功
+  React.useEffect(() => {
+    if (isSuccess) {
+      alert('Color purchased successfully!');
+      refetchUserColors(); // 刷新用户颜色列表
+      reset();
+    }
+  }, [isSuccess, refetchUserColors, reset]);
+
+  // 处理购买错误
+  React.useEffect(() => {
+    if (error) {
+      alert(`Purchase failed: ${error.message}`);
+    }
+  }, [error]);
+
+  const handleMintColor = async () => {
     if (!isConnected) {
       alert('Please connect your wallet first');
       return;
     }
-    console.log("Minting color:", selectedColor);
+    
+    if (!address) {
+      alert('Wallet address not found');
+      return;
+    }
+
+    try {
+      // 生成一个临时的 colorId（实际应该从后端获取可用的颜色ID）
+      const colorId = Math.floor(Math.random() * 1000000) + 1;
+      
+      // 生成 metadata URI（实际应该上传到 IPFS）
+      const metadataURI = `ipfs://color-${colorId}-${selectedColor.replace('#', '')}`;
+      
+      await purchaseColor(colorId, metadataURI);
+    } catch (err) {
+      console.error('Error in handleMintColor:', err);
+    }
   };
 
-  const handleFreeReceive = () => {
+  const handleFreeReceive = async () => {
     if (!isConnected) {
       alert('Please connect your wallet first');
       return;
     }
-    if (invitationCode.trim()) {
-      console.log("Redeeming invitation code:", invitationCode);
+    
+    if (!address) {
+      alert('Wallet address not found');
+      return;
+    }
+    
+    if (!invitationCode.trim()) {
+      alert('Please enter an invitation code');
+      return;
+    }
+
+    setIsRedeeming(true);
+    try {
+      // 生成一个随机颜色ID用于奖励
+      const randomColorId = Math.floor(Math.random() * 1000000) + 1;
+      
+      const result = await rewardColor({
+        address: address,
+        color_id: randomColorId,
+      });
+      
+      alert(`Color rewarded successfully! Color: ${result.color_code}`);
+      setInvitationCode('');
+      refetchUserColors(); // 刷新用户颜色列表
+    } catch (err) {
+      console.error('Error redeeming invitation code:', err);
+      alert(`Failed to redeem: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsRedeeming(false);
     }
   };
-
-  const userColors = [
-    { id: 1, hex: "#592386" },
-    { id: 2, hex: "#237286" },
-    { id: 3, hex: "#FFE1E1" },
-    { id: 4, hex: "#F1674F" },
-  ];
 
   return (
     <>
@@ -93,6 +157,12 @@ function MintColorPage() {
                   className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
                 >
                   GALLERY
+                </button>
+                <button
+                  onClick={() => handleNavigation("/my-paints")}
+                  className="font-['Montserrat',sans-serif] font-normal text-[18px] leading-normal uppercase text-white bg-transparent border-none cursor-pointer transition-all hover:text-[#1ee11f] hover:bg-[rgba(30,225,31,0.1)] px-3 py-2 rounded"
+                >
+                  MY PAINTS
                 </button>
               </nav>
             </div>
@@ -154,17 +224,18 @@ function MintColorPage() {
             Price:
           </div>
           <div className="absolute h-5 text-base text-center text-white left-[865px] top-[248px] w-[89px] max-md:left-2/4 max-md:ml-0 max-md:-translate-x-2/4 max-md:top-[563px] max-sm:ml-0 max-sm:text-sm max-sm:top-[467px]">
-            0.0001 ETH
+            {isPriceLoading ? '...' : `${priceInEth} ETH`}
           </div>
           <div className="absolute text-xs text-center line-through h-[15px] left-[865px] text-white text-opacity-50 top-[272px] w-[70px] max-md:left-2/4 max-md:ml-0 max-md:-translate-x-2/4 max-md:top-[587px] max-sm:ml-0 max-sm:text-xs max-sm:top-[487px]">
-            0.0006 ETH
+            {isPriceLoading ? '' : `${(parseFloat(priceInEth) * 6).toFixed(4)} ETH`}
           </div>
           <button
             onClick={handleMintColor}
-            className="absolute h-12 bg-violet-600 rounded-3xl cursor-pointer left-[806px] top-[311px] w-[280px] max-md:left-2/4 max-md:-translate-x-2/4 max-md:top-[626px] max-sm:h-11 max-sm:top-[516px] max-sm:w-[250px] hover:bg-violet-700 transition-colors"
+            disabled={isPurchasing || !isConnected}
+            className="absolute h-12 bg-violet-600 rounded-3xl cursor-pointer left-[806px] top-[311px] w-[280px] max-md:left-2/4 max-md:-translate-x-2/4 max-md:top-[626px] max-sm:h-11 max-sm:top-[516px] max-sm:w-[250px] hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="absolute top-3.5 h-5 text-base font-semibold text-center text-white left-[97px] w-[86px] max-sm:top-3 max-sm:text-sm max-sm:left-[82px]">
-              Mint Color
+              {isPurchasing ? 'Purchasing...' : 'Mint Color'}
             </div>
           </button>
           <div>
@@ -214,10 +285,11 @@ function MintColorPage() {
             </div>
             <button
               onClick={handleFreeReceive}
-              className="absolute top-0 right-0 h-10 bg-green-500 rounded-xl cursor-pointer w-[100px] max-sm:h-9 max-sm:w-[90px] hover:bg-green-600 transition-colors"
+              disabled={isRedeeming || !isConnected || !invitationCode.trim()}
+              className="absolute top-0 right-0 h-10 bg-green-500 rounded-xl cursor-pointer w-[100px] max-sm:h-9 max-sm:w-[90px] hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="absolute left-1 text-xs font-semibold text-center h-[15px] text-neutral-900 top-[13px] w-[92px] max-sm:text-xs max-sm:top-[11px] max-sm:w-[82px]">
-                Free to receive
+                {isRedeeming ? 'Redeeming...' : 'Free to receive'}
               </div>
             </button>
           </div>
@@ -225,42 +297,48 @@ function MintColorPage() {
             <div className="absolute top-4 left-4 text-2xl font-medium text-white h-[29px] w-[126px] max-sm:top-3 max-sm:left-3 max-sm:text-xl">
               Your Color
             </div>
-            {userColors.map((color, index) => (
-              <div
-                key={color.id}
-                className="absolute h-[63px] top-[61px] w-[51px] max-sm:h-[55px] max-sm:top-[53px] max-sm:w-[45px]"
-                style={{ left: `${16 + index * 75}px` }}
-              >
-                <div>
-                  <svg
-                    width="40"
-                    height="40"
-                    viewBox="0 0 40 40"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="color-circle"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      position: "absolute",
-                      left: "5px",
-                      top: "0",
-                    }}
-                  >
-                    <circle
-                      cx="20"
-                      cy="20"
-                      r="19.5"
-                      fill={color.hex}
-                      stroke="white"
-                    />
-                  </svg>
-                </div>
-                <div className="absolute left-0 top-12 text-xs text-center h-[15px] text-white text-opacity-50 w-[51px] max-sm:text-xs max-sm:top-[42px] max-sm:w-[45px]">
-                  {color.hex}
-                </div>
+            {userColors.length === 0 ? (
+              <div className="absolute top-[61px] left-4 text-sm text-white text-opacity-50">
+                {isConnected ? 'No colors owned yet' : 'Connect wallet to view your colors'}
               </div>
-            ))}
+            ) : (
+              userColors.slice(0, 8).map((color, index) => (
+                <div
+                  key={color.id}
+                  className="absolute h-[63px] top-[61px] w-[51px] max-sm:h-[55px] max-sm:top-[53px] max-sm:w-[45px]"
+                  style={{ left: `${16 + index * 75}px` }}
+                >
+                  <div>
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 40 40"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="color-circle"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        position: "absolute",
+                        left: "5px",
+                        top: "0",
+                      }}
+                    >
+                      <circle
+                        cx="20"
+                        cy="20"
+                        r="19.5"
+                        fill={color.color_code}
+                        stroke="white"
+                      />
+                    </svg>
+                  </div>
+                  <div className="absolute left-0 top-12 text-xs text-center h-[15px] text-white text-opacity-50 w-[51px] max-sm:text-xs max-sm:top-[42px] max-sm:w-[45px]">
+                    {color.color_code}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
