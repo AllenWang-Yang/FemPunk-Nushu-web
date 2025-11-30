@@ -1,93 +1,61 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useUserCanvas } from '../../lib/hooks/useUserCanvas';
 import { Canvas } from '../../lib/services/canvasService';
-
-/**
- * MyPaintsPage Component
- *
- * @description
- * Displays user's participated artworks with contribution details and settlement options.
- * Shows contribution amount, settleable amount, and settlement button.
- *
- * @features
- * - Wallet connection required
- * - Grid layout of participated artworks
- * - Contribution and earnings display
- * - Settlement button (active only when canvas status is 3)
- * - Navigation bar matching other pages
- */
-
-interface CanvasContribution {
-  canvas_id: string;
-  day_timestamp: number;
-  metadata_uri: string;
-  total_raised_wei: string;
-  settleable_amount: number;
-  finalized: number;
-  contributions: number;
-  created_ts: number;
-  status?: number; // 0=stopped, 1=active, 2=minted, 3=settled
-}
-
-// Mock data for testing
-const MOCK_CANVASES: CanvasContribution[] = [
-  {
-    canvas_id: '123456789',
-    day_timestamp: Date.now() - 86400000 * 2, // 2 days ago
-    metadata_uri: '',
-    total_raised_wei: '180000000000000000',
-    settleable_amount: 32400000000000000,
-    finalized: 1,
-    contributions: 150,
-    created_ts: Date.now() - 86400000 * 2,
-    status: 3, // Settled - green button
-  },
-  {
-    canvas_id: '987654321',
-    day_timestamp: Date.now() - 86400000 * 5, // 5 days ago
-    metadata_uri: '',
-    total_raised_wei: '240000000000000000',
-    settleable_amount: 0,
-    finalized: 0,
-    contributions: 89,
-    created_ts: Date.now() - 86400000 * 5,
-    status: 2, // Minted - gray button
-  },
-  {
-    canvas_id: '456789123',
-    day_timestamp: Date.now() - 86400000 * 10, // 10 days ago
-    metadata_uri: '',
-    total_raised_wei: '150000000000000000',
-    settleable_amount: 15000000000000000,
-    finalized: 0,
-    contributions: 45,
-    created_ts: Date.now() - 86400000 * 10,
-    status: 1, // Active - gray button
-  },
-];
+import { useClaimRevenue } from '../../lib/hooks/useRevenueContract';
+import { recordRevenueClaim } from '../../lib/services/revenueService';
 
 export function MyPaintsPage() {
   const router = useRouter();
-  const { isConnected } = useAccount();
-  const { canvasList, isLoading, error } = useUserCanvas();
-
-
+  const { isConnected, address } = useAccount();
+  const { canvasList, isLoading, error, refetch } = useUserCanvas();
+  const { claimRevenue, isLoading: isClaiming, isSuccess, error: claimError, txHash } = useClaimRevenue();
+  const [currentClaimingCanvas, setCurrentClaimingCanvas] = useState<string | null>(null);
 
   const handleNavigation = (path: string) => {
     router.push(path);
   };
 
   const handleSettle = async (canvas: Canvas) => {
-    // Disabled for demo - no operation allowed
-    console.log('Settlement disabled for demo. Canvas:', canvas.canvas_id);
-    return;
+    if (!address) return;
+    
+    try {
+      console.log('Claiming revenue for canvas:', canvas.canvas_id);
+      setCurrentClaimingCanvas(canvas.canvas_id);
+      await claimRevenue(parseInt(canvas.canvas_id));
+    } catch (err) {
+      console.error('Failed to claim revenue:', err);
+      setCurrentClaimingCanvas(null);
+    }
   };
+
+  // 监听交易成功后调用recordRevenueClaim
+  useEffect(() => {
+    if (isSuccess && txHash && address && currentClaimingCanvas) {
+      const recordClaim = async () => {
+        try {
+          console.log('Recording claim for canvas:', currentClaimingCanvas, 'with txHash:', txHash);
+          await recordRevenueClaim({
+            contributor: address,
+            canvas_id: currentClaimingCanvas,
+            tx_hash: txHash
+          });
+          console.log('Claim recorded successfully');
+          refetch();
+          setCurrentClaimingCanvas(null);
+        } catch (err) {
+          console.error('Failed to record claim:', err);
+          setCurrentClaimingCanvas(null);
+        }
+      };
+      recordClaim();
+    }
+  }, [isSuccess, txHash, address, currentClaimingCanvas, refetch]);
 
   const formatEth = (wei: string) => {
     try {
@@ -105,7 +73,6 @@ export function MyPaintsPage() {
 
   return (
     <div className="relative overflow-hidden bg-[#161616] min-h-screen">
-      {/* Background Image */}
       <div className="fixed inset-0 w-full h-screen pointer-events-none z-0">
         <Image
           src="/images/homepage/top_bg.png"
@@ -118,7 +85,6 @@ export function MyPaintsPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#161616]/30 to-[#161616]/80" />
       </div>
 
-      {/* Navigation Bar */}
       <nav className="relative left-0 top-0 w-full h-24 z-[100]">
         <div className="relative w-full h-full flex items-center justify-between px-7 max-w-[1440px] mx-auto">
           <div className="flex items-center gap-14">
@@ -174,7 +140,6 @@ export function MyPaintsPage() {
         </div>
       </nav>
 
-      {/* Content */}
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 mt-10">
         {!isConnected ? (
           <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -208,18 +173,16 @@ export function MyPaintsPage() {
         ) : (
           <div className="flex flex-wrap gap-2.5 items-start justify-center">
             {canvasList.map((canvas) => {
-              // Canvas is settleable when finalized
-              const isSettleable = canvas.finalized === 1;
-              const settleableAmount = parseFloat(canvas.total_raised_wei) * 0.18; // 18% of total raised
+              const canvasWithClaimed = canvas as Canvas & { claimed?: number };
+              const isClaimable = canvas.finalized === 1 && (canvasWithClaimed.claimed === 0 || canvasWithClaimed.claimed === undefined);
+              const settleableAmount = parseFloat(canvas.total_raised_wei) * 0.18;
               
               return (
                 <div key={canvas.canvas_id} className="w-[350px]">
-                  {canvas.metadata_uri ? (
-                    <Image
-                      src={canvas.metadata_uri}
+                  {canvas.image_url ? (
+                    <img
+                      src={canvas.image_url}
                       alt={`Canvas ${canvas.canvas_id}`}
-                      width={350}
-                      height={350}
                       className="object-cover z-10 w-[350px] h-[350px] rounded"
                     />
                   ) : (
@@ -230,32 +193,48 @@ export function MyPaintsPage() {
                   
                   <div className="flex flex-col px-4 pt-12 pb-4 w-full rounded-xl border border-solid bg-zinc-800 border-white border-opacity-10 -mt-12">
                     <div className="self-start text-sm font-medium text-white mb-3">
-                      {formatDate(canvas.day_timestamp * 1000)}
+                      {formatDate(canvas.day_timestamp * 1000)} {canvas.canvas_id.slice(-5)}
                     </div>
                     
                     <div className="flex flex-col gap-2 text-xs text-white mb-4">
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Total Raised:</span>
-                        <span className="font-semibold">{formatEth(canvas.total_raised_wei)} ETH</span>
+                        <span className="text-gray-400">Canvas ID:</span>
+                        <span className="font-semibold">{canvas.canvas_id}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Settleable Amount:</span>
-                        <span className={`font-semibold ${isSettleable ? 'text-[#1ee11f]' : 'text-gray-500'}`}>
-                          {isSettleable ? `${formatEth(settleableAmount.toString())} ETH` : 'Not available'}
+                        <span className="text-gray-400">Contributions:</span>
+                        <span className="font-semibold">{canvas.contributions || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Claimable Amount:</span>
+                        <span className={`font-semibold ${isClaimable ? 'text-[#1ee11f]' : 'text-gray-500'}`}>
+                          {canvas.finalized === 1 ? `${formatEth(settleableAmount.toString())} ETH` : 'Not available'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Status:</span>
+                        <span className={`font-semibold ${
+                          canvasWithClaimed.claimed === 1 ? 'text-green-500' : 
+                          canvas.finalized === 1 ? 'text-yellow-500' : 'text-gray-500'
+                        }`}>
+                          {canvasWithClaimed.claimed === 1 ? 'Claimed' : 
+                           canvas.finalized === 1 ? 'Ready to Claim' : 'Not Ready'}
                         </span>
                       </div>
                     </div>
                     
                     <button
                       onClick={() => handleSettle(canvas)}
-                      disabled={true}
-                      className={`w-full px-6 py-3 font-semibold text-center rounded-3xl border-0 cursor-not-allowed transition-all ${
-                        isSettleable
-                          ? 'bg-[#1ee11f] text-[#161616]'
-                          : 'bg-gray-600 text-gray-400'
+                      disabled={!isClaimable || isClaiming}
+                      className={`w-full px-6 py-3 font-semibold text-center rounded-3xl border-0 transition-all ${
+                        isClaimable && !isClaiming
+                          ? 'bg-[#1ee11f] text-[#161616] cursor-pointer hover:bg-[#2fff30]'
+                          : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
                     >
-                      {isSettleable ? `Settle ${formatEth(settleableAmount.toString())} ETH` : 'Not Settleable'}
+                      {isClaiming ? 'Claiming...' :
+                       canvasWithClaimed.claimed === 1 ? 'Already Claimed' :
+                       isClaimable ? `Claim ${formatEth(settleableAmount.toString())} ETH` : 'Not Claimable'}
                     </button>
                   </div>
                 </div>

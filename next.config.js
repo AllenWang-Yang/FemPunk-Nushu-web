@@ -2,6 +2,22 @@
 const nextConfig = {
   images: {
     domains: ['ipfs.filebase.io'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ipfs.filebase.io',
+        port: '',
+        pathname: '/ipfs/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.ipfs.dweb.link',
+      },
+      {
+        protocol: 'https',
+        hostname: 'gateway.pinata.cloud',
+      },
+    ],
   },
   async rewrites() {
     return [

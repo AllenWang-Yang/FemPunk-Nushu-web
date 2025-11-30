@@ -17,6 +17,7 @@ export interface Canvas {
   tx_hash?: string;
   created_ts?: number;
   updated_ts?: number;
+  contributions?: number;
 }
 
 export interface RecordCanvasPurchaseParams {

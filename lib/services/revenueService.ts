@@ -11,7 +11,7 @@ export interface RevenueShare {
   canvas_id: string;
   contributions: number;
   reward_wei: string;
-  claimed: number;
+  claimed: number; // 0=未领取, 1=已领取
   claimed_tx: string | null;
 }
 
