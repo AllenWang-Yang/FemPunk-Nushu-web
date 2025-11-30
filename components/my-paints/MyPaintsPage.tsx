@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useUserCanvas } from '../../lib/hooks/useUserCanvas';
+import { Canvas } from '../../lib/services/canvasService';
 
 /**
  * MyPaintsPage Component
@@ -82,7 +83,7 @@ export function MyPaintsPage() {
     router.push(path);
   };
 
-  const handleSettle = async (canvas: CanvasContribution) => {
+  const handleSettle = async (canvas: Canvas) => {
     // Disabled for demo - no operation allowed
     console.log('Settlement disabled for demo. Canvas:', canvas.canvas_id);
     return;
