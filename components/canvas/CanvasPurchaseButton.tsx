@@ -53,7 +53,7 @@ export function CanvasPurchaseButton({
       return;
     }
 
-    await purchaseCanvas(canvasId, price as bigint);
+    await purchaseCanvas(canvasId.toString(), `https://api.fempunk.com/canvas/${canvasId}/metadata`);
   };
 
   // 未连接钱包

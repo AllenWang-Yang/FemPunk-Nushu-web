@@ -167,5 +167,42 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
   };
 }
 
+// Canvas price hook
+export function useCanvasPrice(canvasId: bigint) {
+  const price = parseEther('0.001');
+  const priceInEth = '0.001';
+  
+  return {
+    price,
+    priceInEth
+  };
+}
+
+// Canvas purchase info hook
+export function useCanvasPurchaseInfo(canvasId: bigint) {
+  const [purchaseInfo, setPurchaseInfo] = useState<{
+    minted: bigint;
+    remaining: bigint;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  return {
+    purchaseInfo: purchaseInfo || { minted: 0n, remaining: 100n },
+    isLoading
+  };
+}
+
+// Check if user has purchased canvas hook
+export function useHasPurchasedCanvas(canvasId: bigint) {
+  const { address } = useAccount();
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  return {
+    hasPurchased,
+    isLoading
+  };
+}
+
 // 导出 useCurrentCanvas hook
 export { useCurrentCanvas } from './useCurrentCanvas';
