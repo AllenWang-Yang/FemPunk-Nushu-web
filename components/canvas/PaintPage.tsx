@@ -21,8 +21,16 @@ function MyColorSection() {
       </div>
       {/* Color preview */}
       {userColors.length > 0 ? (
-        <div className="mt-2.5 w-8 h-8 rounded-full border-2 border-white self-center" 
-             style={{ backgroundColor: userColors[0].color_code }}>
+        <div className="mt-2.5 grid grid-cols-2 gap-2 w-full px-2">
+          {userColors.map((color, index) => (
+            <div 
+              key={color.id || index}
+              className="w-8 h-8 rounded-full border-2 border-white" 
+              style={{ backgroundColor: color.color_code }}
+              title={`Color #${color.color_id}`}
+            >
+            </div>
+          ))}
         </div>
       ) : (
         <div className="mt-2.5 w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center self-center">

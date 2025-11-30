@@ -38,19 +38,17 @@ export const wagmiConfig = createConfig({
   ],
   transports: {
     [baseSepolia.id]: fallback([
+      ...(alchemyApiKey ? [http(`https://base-sepolia.g.alchemy.com/v2/${alchemyApiKey}`)] : []),
       http('https://sepolia.base.org'),
-      http('https://base-sepolia.g.alchemy.com/v2/demo'),
       http('https://base-sepolia.publicnode.com'),
     ]),
     [sepolia.id]: fallback([
-      ...(alchemyApiKey ? [http(`https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`)] : []),
       http('https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'),
       http('https://rpc.sepolia.org'),
       http('https://ethereum-sepolia.publicnode.com'),
       http('https://sepolia.gateway.tenderly.co'),
     ]),
     [mainnet.id]: fallback([
-      ...(alchemyApiKey ? [http(`https://eth-mainnet.g.alchemy.com/v2/${alchemyApiKey}`)] : []),
       http('https://ethereum.publicnode.com'),
       http('https://cloudflare-eth.com'),
       http('https://rpc.ankr.com/eth'),

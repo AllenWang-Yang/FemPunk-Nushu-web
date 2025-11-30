@@ -4,6 +4,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAllCanvas } from '../../lib/hooks/useAllCanvas';
+import CanvasGrid from '../canvas/CanvasGrid';
+import type { Canvas } from '../../lib/services/canvasService';
 
 /**
  * GalleryPage Component
@@ -22,80 +25,24 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export function GalleryPage() {
   const router = useRouter();
-
-  const artworks = [
-    {
-      id: '1',
-      day: 24,
-      title: 'Spring Garden',
-      participants: 100,
-      status: 'painting' as const,
-      imageUrl: '',
-    },
-    {
-      id: '2',
-      day: 23,
-      title: 'Spring Garden',
-      participants: 100,
-      status: 'mint' as const,
-      price: 0.24,
-      imageUrl: '',
-    },
-    {
-      id: '3',
-      day: 22,
-      title: 'Spring Garden',
-      participants: 100,
-      status: 'buy' as const,
-      price: 0.24,
-      imageUrl: '',
-    },
-    {
-      id: '4',
-      day: 21,
-      title: 'Spring Garden',
-      participants: 100,
-      status: 'buy' as const,
-      price: 0.24,
-      imageUrl: '',
-    },
-    {
-      id: '5',
-      day: 20,
-      title: 'Spring Garden',
-      participants: 100,
-      status: 'buy' as const,
-      price: 0.24,
-      imageUrl: '',
-    },
-    {
-      id: '6',
-      day: 19,
-      title: 'Spring Garden',
-      participants: 100,
-      status: 'buy' as const,
-      price: 0.24,
-      imageUrl: '',
-    },
-  ];
+  const handleCanvasSelect = (canvas: Canvas) => {
+    const daysSinceEpoch = Math.floor(canvas.day_timestamp / (24 * 60 * 60));
+    const isToday = Math.floor(Date.now() / (24 * 60 * 60 * 1000)) === daysSinceEpoch;
+    
+    if (isToday) {
+      router.push('/canvas');
+    } else if (canvas.finalized) {
+      console.log('Buy canvas:', canvas);
+    } else {
+      console.log('Mint canvas:', canvas);
+    }
+  };
 
   const handleNavigation = (path: string) => {
     router.push(path);
   };
 
-  const handleActionClick = (artwork: typeof artworks[0]) => {
-    switch (artwork.status) {
-      case 'painting':
-        router.push('/canvas');
-        break;
-      case 'mint':
-        console.log('Mint artwork:', artwork);
-        break;
-      case 'buy':
-        console.log('Buy artwork:', artwork);
-        break;
-    }
-  };
+
 
   return (
     <div className="relative overflow-hidden bg-[#161616] min-h-screen">
@@ -174,67 +121,8 @@ export function GalleryPage() {
       </nav>
 
       {/* Gallery Grid */}
-      <div className="relative z-10 flex flex-wrap gap-2.5 items-start justify-center mt-10 w-full max-w-[1440px] max-md:max-w-full px-4 mx-auto">
-        {artworks.map((artwork) => (
-          <div key={artwork.id} className="w-[350px]">
-            {artwork.imageUrl ? (
-              <Image
-                src={artwork.imageUrl}
-                alt={`Day ${artwork.day} - ${artwork.title}`}
-                width={350}
-                height={350}
-                className="object-cover z-10 w-[350px] h-[350px] rounded"
-              />
-            ) : (
-              <div className="w-[350px] h-[350px] rounded bg-neutral-700/50 flex items-center justify-center">
-                <span className="text-neutral-500 text-sm">Artwork {artwork.day}</span>
-              </div>
-            )}
-            <div className="flex flex-col px-4 pt-12 pb-4 w-full rounded-xl border border-solid bg-zinc-800 border-white border-opacity-10 -mt-12">
-              <div className="self-start text-sm font-medium text-white">
-                Day {artwork.day}｜{artwork.title}
-              </div>
-              <div className="flex gap-5 justify-between mt-1.5 w-full text-xs whitespace-nowrap">
-                <div className="flex gap-3 self-start text-white">
-                  <div className="flex gap-1 items-center">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                    </svg>
-                    <div>{artwork.participants}</div>
-                  </div>
-                  {artwork.status !== 'painting' && (
-                    <div className="flex gap-1 items-center">
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 320 512">
-                        <path d="M311.9 260.8L160 353.6 8 260.8 160 0l151.9 260.8zM160 383.4L8 290.6 160 512l152-221.4-152 92.8z"/>
-                      </svg>
-                      <div>{artwork.price}ETH</div>
-                    </div>
-                  )}
-                  {artwork.status === 'painting' && (
-                    <div>Painting now...</div>
-                  )}
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleActionClick(artwork);
-                  }}
-                  className={`flex flex-col justify-center px-6 py-3 font-semibold text-center rounded-3xl border-0 cursor-pointer transition-all hover:scale-105 max-md:px-5 ${
-                    artwork.status === 'painting'
-                      ? 'bg-violet-600 text-white hover:bg-violet-700'
-                      : artwork.status === 'mint'
-                      ? 'bg-[#1ee11f] text-[#161616] hover:bg-[#2fff30]'
-                      : 'bg-white bg-opacity-10 border border-solid border-white border-opacity-50 text-white hover:bg-white hover:bg-opacity-20 hover:border-opacity-80'
-                  }`}
-                >
-                  <div>
-                    {artwork.status === 'painting' ? 'Paint' : artwork.status === 'mint' ? 'Mint' : 'Buy'}
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="relative z-10 mt-10 w-full max-w-[1440px] mx-auto">
+        <CanvasGrid onCanvasSelect={handleCanvasSelect} />
       </div>
 
     </div>

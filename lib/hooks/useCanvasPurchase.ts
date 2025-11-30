@@ -1,10 +1,12 @@
 /**
- * 画布购买 Hook - 简化版本
+ * 画布购买 Hook
  */
 
 import React, { useState } from 'react';
-import { useAccount, useWriteContract, useChainId } from 'wagmi';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
 import { parseEther } from 'viem';
+import { baseSepolia } from 'viem/chains';
+import { recordCanvasPurchase } from '../services/canvasService';
 import { getFemCanvasContract } from '../contracts/config';
 
 export interface UseCanvasPurchaseResult {
@@ -12,7 +14,7 @@ export interface UseCanvasPurchaseResult {
   isSuccess: boolean;
   error: Error | null;
   txHash: string | null;
-  purchaseCanvas: (canvasId: bigint, price?: bigint) => Promise<void>;
+  purchaseCanvas: (canvasId: string, metadataURI: string) => Promise<void>;
   reset: () => void;
 }
 
@@ -23,14 +25,75 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [pendingTx, setPendingTx] = useState<{
+    hash: string;
+    canvasId: string;
+    address: string;
+    price: bigint;
+  } | null>(null);
 
   const { writeContractAsync } = useWriteContract();
-  const contract = chainId ? getFemCanvasContract(chainId) : null;
 
-  const purchaseCanvas = async (canvasId: bigint, price?: bigint) => {
-    if (!address || !contract) {
+  // Wait for transaction confirmation
+  const { data: receipt, isSuccess: isConfirmed, error: receiptError } = useWaitForTransactionReceipt({
+    hash: pendingTx?.hash as `0x${string}`,
+    query: {
+      enabled: !!pendingTx?.hash,
+    },
+  });
+
+  // Record purchase after confirmation
+  React.useEffect(() => {
+    if (isConfirmed && receipt && pendingTx) {
+      const recordPurchase = async () => {
+        try {
+          console.log('Transaction confirmed, recording to backend...');
+          await recordCanvasPurchase({
+            canvas_id: pendingTx.canvasId,
+            buyer_address: pendingTx.address,
+            tx_hash: pendingTx.hash,
+            amount_wei: pendingTx.price.toString(),
+          });
+          console.log('Canvas purchase recorded successfully');
+          setIsSuccess(true);
+        } catch (err) {
+          console.error('Failed to record canvas purchase:', err);
+          setError(new Error('Transaction successful but backend recording failed'));
+        } finally {
+          setIsPurchasing(false);
+          setPendingTx(null);
+        }
+      };
+      recordPurchase();
+    }
+  }, [isConfirmed, receipt, pendingTx]);
+
+  // Handle transaction failure
+  React.useEffect(() => {
+    if (receiptError && pendingTx) {
+      console.error('Transaction failed:', receiptError);
+      setError(new Error('Transaction failed'));
+      setIsPurchasing(false);
+      setPendingTx(null);
+    }
+  }, [receiptError, pendingTx]);
+
+  const { switchChain } = useSwitchChain();
+
+  const purchaseCanvas = async (canvasId: string, metadataURI: string) => {
+    if (!address) {
       setError(new Error('Please connect your wallet'));
       return;
+    }
+
+    // 检查并切换到 Base Sepolia
+    if (chainId !== baseSepolia.id) {
+      try {
+        await switchChain({ chainId: baseSepolia.id });
+      } catch (err) {
+        setError(new Error('Please switch to Base Sepolia network'));
+        return;
+      }
     }
 
     setIsPurchasing(true);
@@ -39,21 +102,49 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
     setTxHash(null);
 
     try {
-      const purchasePrice = price || parseEther('0.0018');
+      console.log('=== Canvas Purchase Debug Info ===');
+      console.log('Chain ID:', chainId);
+      console.log('User Address:', address);
+      console.log('Canvas ID:', canvasId);
+      console.log('Metadata URI:', metadataURI);
+      
+      const canvasPrice = parseEther('0.001');
+      const contract = getFemCanvasContract(baseSepolia.id);
       
       const hash = await writeContractAsync({
         address: contract.address,
         abi: contract.abi,
         functionName: 'buyCanvas',
-        args: [canvasId],
-        value: purchasePrice,
+        args: [BigInt(canvasId)],
+        value: canvasPrice,
       });
-
+      
+      console.log('Transaction sent:', hash);
       setTxHash(hash);
-      setIsSuccess(true);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to purchase canvas'));
-    } finally {
+
+      setPendingTx({
+        hash,
+        canvasId,
+        address,
+        price: canvasPrice,
+      });
+      
+    } catch (err: any) {
+      console.error('=== Canvas Purchase Error ===');
+      console.error('Error:', err);
+      
+      let errorMessage = 'Failed to purchase canvas';
+      if (err.message?.includes('Canvas does not exist')) {
+        errorMessage = 'Canvas not found';
+      } else if (err.message?.includes('Canvas already finalized')) {
+        errorMessage = 'Canvas is no longer available for purchase';
+      } else if (err.message?.includes('insufficient funds')) {
+        errorMessage = 'Insufficient ETH balance';
+      } else if (err.message?.includes('rejected')) {
+        errorMessage = 'Transaction cancelled by user';
+      }
+      
+      setError(new Error(errorMessage));
       setIsPurchasing(false);
     }
   };
@@ -63,6 +154,7 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
     setIsSuccess(false);
     setError(null);
     setTxHash(null);
+    setPendingTx(null);
   };
 
   return {
@@ -75,80 +167,5 @@ export function useCanvasPurchase(): UseCanvasPurchaseResult {
   };
 }
 
-// 简化的价格Hook
-export function useCanvasPrice(canvasId?: bigint) {
-  return {
-    price: parseEther('0.0018'),
-    priceInEth: '0.0018',
-    isLoading: false,
-    error: null,
-  };
-}
-
-// 简化的购买信息Hook
-export function useCanvasPurchaseInfo(canvasId?: bigint) {
-  return {
-    purchaseInfo: {
-      price: parseEther('0.0018'),
-      minted: 0n,
-      remaining: 100n,
-      userHasMinted: false,
-    },
-    isLoading: false,
-    error: null,
-  };
-}
-
-// 简化的购买状态Hook
-export function useHasPurchasedCanvas(canvasId?: bigint) {
-  return {
-    hasPurchased: false,
-    balance: 0n,
-    isLoading: false,
-  };
-}
-
-// 当前画布信息Hook
-export function useCurrentCanvas() {
-  const [canvas, setCanvas] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const fetchCanvas = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // 模拟获取当前画布数据
-      const mockCanvas = {
-        canvas_id: '1',
-        day_timestamp: Date.now(),
-        total_raised_wei: '1800000000000000', // 0.0018 ETH
-        finalized: false,
-        metadata_uri: '/images/homepage/spring.png',
-      };
-      
-      setCanvas(mockCanvas);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch canvas'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refetch = () => {
-    fetchCanvas();
-  };
-
-  // 初始加载
-  React.useEffect(() => {
-    fetchCanvas();
-  }, []);
-
-  return {
-    canvas,
-    isLoading,
-    error,
-    refetch,
-  };
-}
+// 导出 useCurrentCanvas hook
+export { useCurrentCanvas } from './useCurrentCanvas';

@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import styles from './HomePage.module.css';
+import { useCanvas } from '../../lib/hooks/useCanvas';
 
 /**
  * FemPunk Nvshu - Home Page Component
@@ -313,9 +314,61 @@ const HomePage: React.FC<HomePageProps> = ({
           </button>
         </div>
       </section>
+
+      {/* ============================================
+           Canvas Section
+           ============================================ */}
+      <CanvasSection />
     </div>
   );
 };
+
+// Canvas Section Component
+function CanvasSection() {
+  const { canvas, isLoading, error } = useCanvas();
+
+  console.log('Canvas data:', { canvas, isLoading, error });
+
+  if (isLoading) {
+    return (
+      <section className={styles.canvasSection}>
+        <div className={styles.canvasLoading}>Loading canvas...</div>
+      </section>
+    );
+  }
+
+  if (error || !canvas || !canvas.image_url) {
+    console.log('Canvas not showing:', { error, canvas, hasImageUrl: canvas?.image_url });
+    return null;
+  }
+
+  return (
+    <section className={styles.canvasSection}>
+      <div className={styles.sectionTitle}>
+        <h2>Today's Canvas</h2>
+      </div>
+      <div className={styles.canvasContainer}>
+        <div className={styles.canvasPreview}>
+          <Image
+            src={canvas.image_url}
+            alt="Today's canvas"
+            width={400}
+            height={400}
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
+        <div className={styles.canvasInfo}>
+          <h3>Canvas #{canvas.canvas_id}</h3>
+          <p>Total Raised: {(parseFloat(canvas.total_raised_wei) / 1e18).toFixed(4)} ETH</p>
+          <p>Status: {canvas.finalized ? 'Finalized' : 'Active'}</p>
+          <button className={styles.buyCanvasButton}>
+            Buy Canvas NFT
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 // Featured Artworks Data
 const FEATURED_ARTWORKS = [

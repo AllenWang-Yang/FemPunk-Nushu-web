@@ -7,7 +7,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useCurrentCanvas } from '../../lib/hooks/useCanvasPurchase';
+import { useCurrentCanvas } from '../../lib/hooks/useCurrentCanvas';
 import CanvasPurchaseButton from './CanvasPurchaseButton';
 
 interface CanvasDetailModalProps {

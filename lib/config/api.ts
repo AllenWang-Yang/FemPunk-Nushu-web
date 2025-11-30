@@ -7,7 +7,7 @@
 export const BACKEND_URL = '';
 
 // API 超时配置（毫秒）
-export const API_TIMEOUT = 30000; // 30秒
+export const API_TIMEOUT = 10000; // 10秒
 
 // API 请求头配置
 export const API_HEADERS = {
@@ -36,7 +36,9 @@ export async function fetchWithTimeout(
   timeout: number = API_TIMEOUT
 ): Promise<Response> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const timeoutId = setTimeout(() => {
+    controller.abort('Request timeout');
+  }, timeout);
 
   try {
     const response = await fetch(url, {
@@ -47,6 +49,15 @@ export async function fetchWithTimeout(
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
-    throw error;
+    
+    // 处理不同类型的错误
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error(`Request was aborted: ${error.message || 'timeout'}`);
+      }
+      throw error;
+    }
+    
+    throw new Error('Unknown error occurred during fetch');
   }
 }

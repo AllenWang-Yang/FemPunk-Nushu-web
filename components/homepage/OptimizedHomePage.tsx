@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { PageLayout } from '../layout/PageLayout';
 import { RevenueModal, useRevenueModal } from '../revenue/RevenueManager';
 import { SendRevenueButton } from '../revenue/RevenueButton';
 import { SetupGuide } from '../setup/SetupGuide';
+import { useCanvas } from '../../lib/hooks/useCanvas';
+import { CanvasMintModal } from '../canvas/CanvasMintModal';
 import styles from './OptimizedHomePage.module.css';
 
 interface ArtworkData {
@@ -281,23 +283,7 @@ export function OptimizedHomePage() {
         </div>
 
         {/* Artworks Canvas and Buttons */}
-        <div className={styles.artworkCanvas1}></div>
-        <button className={styles.artworkButton1}>Mint</button>
-
-        <div className={styles.artworkCanvas2}></div>
-        <button className={styles.artworkButton2}>Buy</button>
-
-        <div className={styles.artworkCanvas3}></div>
-        <button className={styles.artworkButton3}>Buy</button>
-
-        <div className={styles.artworkCanvas4}></div>
-        <button className={styles.artworkButton4}>Buy</button>
-
-        <div className={styles.artworkCanvas5}></div>
-        <button className={styles.artworkButton5}>Buy</button>
-
-        <div className={styles.artworkCanvas6}></div>
-        <button className={styles.artworkButton6}>Buy</button>
+        <CanvasArtworks />
 
         {/* View All Link */}
         <div className={styles.viewAllLink}>
@@ -346,6 +332,8 @@ export function OptimizedHomePage() {
         {/* Community Artworks Section - Empty placeholder for structure */}
         <section className={styles.communitySection} aria-labelledby="community-title">
         </section>
+
+
       </div>
 
       {/* Revenue Modal */}
@@ -359,5 +347,87 @@ export function OptimizedHomePage() {
       {/* Setup Guide */}
       <SetupGuide />
     </PageLayout>
+  );
+}
+
+// Canvas Artworks Component
+function CanvasArtworks() {
+  const { canvasList, isLoading, error } = useCanvas();
+  const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+  const [selectedCanvas, setSelectedCanvas] = useState<any>(null);
+
+  console.log('CanvasArtworks render:', { canvasList, isLoading, error });
+
+  const getButtonText = (canvas: any) => {
+    if (canvas.finalized === 1) return 'View';
+    if (canvas.status === 1) return 'Paint';
+    if (canvas.status === 2) return 'Mint';
+    return 'Buy';
+  };
+
+  const getButtonClass = (index: number, canvas?: any) => {
+    const baseClass = `artworkButton${index + 1}`;
+    if (!canvas) return styles[baseClass];
+    
+    if (canvas.finalized === 1) return styles[baseClass];
+    if (canvas.status === 1) return `${styles[baseClass]} ${styles.paintButton}`;
+    if (canvas.status === 2) return `${styles[baseClass]} ${styles.mintButtonStyle}`;
+    return `${styles[baseClass]} ${styles.buyButtonStyle}`;
+  };
+
+  const handleCanvasClick = (canvas: any) => {
+    const buttonText = getButtonText(canvas);
+    if (buttonText === 'Mint' || buttonText === 'Buy') {
+      setSelectedCanvas(canvas);
+      setIsMintModalOpen(true);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        {[1, 2, 3, 4, 5, 6].map(i => (
+          <React.Fragment key={i}>
+            <div className={styles[`artworkCanvas${i}`]}></div>
+            <button className={styles[`artworkButton${i}`]} onClick={(e) => e.preventDefault()}>Loading</button>
+          </React.Fragment>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {[1, 2, 3, 4, 5, 6].map(i => {
+        const canvas = canvasList[i - 1];
+        return (
+          <React.Fragment key={i}>
+            <div 
+              className={styles[`artworkCanvas${i}`]} 
+              style={canvas?.image_url ? {
+                backgroundImage: `url(${canvas.image_url})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              } : {}}
+            ></div>
+            <button 
+              className={getButtonClass(i - 1, canvas)}
+              onClick={() => canvas ? handleCanvasClick(canvas) : undefined}
+            >
+              {canvas ? getButtonText(canvas) : 'Loading'}
+            </button>
+          </React.Fragment>
+        );
+      })}
+      
+      {/* Canvas Mint Modal */}
+      {selectedCanvas && (
+        <CanvasMintModal
+          isOpen={isMintModalOpen}
+          onClose={() => setIsMintModalOpen(false)}
+          canvas={selectedCanvas}
+        />
+      )}
+    </>
   );
 }

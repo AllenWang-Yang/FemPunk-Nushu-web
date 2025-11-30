@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import { useUserCanvas } from '../../lib/hooks/useUserCanvas';
 
 /**
  * MyPaintsPage Component
@@ -72,41 +73,10 @@ const MOCK_CANVASES: CanvasContribution[] = [
 
 export function MyPaintsPage() {
   const router = useRouter();
-  const { address, isConnected } = useAccount();
-  const [canvases, setCanvases] = useState<CanvasContribution[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { isConnected } = useAccount();
+  const { canvasList, isLoading, error } = useUserCanvas();
 
-  useEffect(() => {
-    if (isConnected && address) {
-      // Use mock data instead of fetching from API
-      setCanvases(MOCK_CANVASES);
-      // fetchUserCanvases();
-    }
-  }, [isConnected, address]);
 
-  const fetchUserCanvases = async () => {
-    if (!address) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/contributions/contributor/${address}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setCanvases(data.canvases || []);
-      } else {
-        setError(data.error || 'Failed to fetch canvases');
-      }
-    } catch (err) {
-      console.error('Error fetching canvases:', err);
-      setError('Failed to load your paintings');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -219,9 +189,9 @@ export function MyPaintsPage() {
           </div>
         ) : error ? (
           <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-red-400 text-lg">{error}</div>
+            <div className="text-red-400 text-lg">{error.message}</div>
           </div>
-        ) : canvases.length === 0 ? (
+        ) : canvasList.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-white mb-4">No Paintings Yet</h2>
@@ -236,10 +206,10 @@ export function MyPaintsPage() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-2.5 items-start justify-center">
-            {canvases.map((canvas) => {
-              // Canvas is settleable when status is 3 (settled) and has settleable amount
-              const isSettleable = canvas.status === 3 && canvas.settleable_amount > 0;
-              const settleableAmount = canvas.settleable_amount || 0;
+            {canvasList.map((canvas) => {
+              // Canvas is settleable when finalized
+              const isSettleable = canvas.finalized === 1;
+              const settleableAmount = parseFloat(canvas.total_raised_wei) * 0.18; // 18% of total raised
               
               return (
                 <div key={canvas.canvas_id} className="w-[350px]">
@@ -259,13 +229,13 @@ export function MyPaintsPage() {
                   
                   <div className="flex flex-col px-4 pt-12 pb-4 w-full rounded-xl border border-solid bg-zinc-800 border-white border-opacity-10 -mt-12">
                     <div className="self-start text-sm font-medium text-white mb-3">
-                      {formatDate(canvas.day_timestamp)}
+                      {formatDate(canvas.day_timestamp * 1000)}
                     </div>
                     
                     <div className="flex flex-col gap-2 text-xs text-white mb-4">
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Contribution:</span>
-                        <span className="font-semibold">{canvas.contributions}</span>
+                        <span className="text-gray-400">Total Raised:</span>
+                        <span className="font-semibold">{formatEth(canvas.total_raised_wei)} ETH</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Settleable Amount:</span>

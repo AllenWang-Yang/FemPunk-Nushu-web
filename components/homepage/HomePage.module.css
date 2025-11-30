@@ -472,6 +472,74 @@
 }
 
 /* ============================================
+   Canvas Section
+   ============================================ */
+
+.canvasSection {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120px 48px;
+  z-index: 10;
+}
+
+.canvasLoading {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.canvasContainer {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+  margin-top: 48px;
+}
+
+.canvasPreview {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.canvasInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #ffffff;
+}
+
+.canvasInfo h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.canvasInfo p {
+  font-size: 16px;
+  margin: 0;
+}
+
+.buyCanvasButton {
+  padding: 12px 24px;
+  background: #1ee11f;
+  color: #000000;
+  border: none;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buyCanvasButton:hover {
+  background: #1bc91c;
+  transform: translateY(-1px);
+}
+
+/* ============================================
    响应式设计
    ============================================ */
 

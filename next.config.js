@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    domains: ['ipfs.filebase.io'],
+  },
   async rewrites() {
     return [
       {

@@ -9,6 +9,7 @@ export interface Canvas {
   canvas_id: string;
   day_timestamp: number;
   metadata_uri: string;
+  image_url?: string;
   creator: string;
   total_raised_wei: string;
   finalized: number;
@@ -28,7 +29,7 @@ export interface RecordCanvasPurchaseParams {
 /**
  * 获取所有画布
  */
-export async function getAllCanvas(): Promise<Canvas> {
+export async function getAllCanvas(): Promise<Canvas[]> {
   try {
     const response = await fetchWithTimeout(`/api/canvas`);
     
@@ -42,9 +43,10 @@ export async function getAllCanvas(): Promise<Canvas> {
       throw new Error(data.error || 'Failed to fetch canvas');
     }
     
-    return data.canvas;
+    // 确保返回数组格式
+    return Array.isArray(data.canvas) ? data.canvas : (data.canvas ? [data.canvas] : []);
   } catch (error) {
-    console.error('Error fetching canvas:', error);
+    console.error('Error fetching all canvas:', error);
     throw error;
   }
 }
@@ -121,6 +123,30 @@ export async function recordCanvasPurchase(params: RecordCanvasPurchaseParams): 
     }
   } catch (error) {
     console.error('Error recording canvas purchase:', error);
+    throw error;
+  }
+}
+
+/**
+ * 获取用户贡献的画布
+ */
+export async function getUserContributedCanvas(userAddress: string): Promise<Canvas[]> {
+  try {
+    const response = await fetchWithTimeout(`/api/contributions/contributor/${userAddress}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user canvas: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch user canvas');
+    }
+    
+    return Array.isArray(data.canvases) ? data.canvases : [];
+  } catch (error) {
+    console.error('Error fetching user canvas:', error);
     throw error;
   }
 }
